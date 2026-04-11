@@ -59,11 +59,7 @@ Ein tiefgehendes, langfristig motivierendes Browsergame zu entwickeln, das klass
 Civil-Wars/
 ├── backend/                  # Node.js / Express Server
 │   ├── database/             # Datenbankskripte
-│   │   ├── schema.sql        # Vollständiges Datenbankschema (Tabellen + Seed-Daten)
-│   │   └── migrations/       # Inkrementelle Migrationen
-│   │       ├── migrate_add_bewohner.sql
-│   │       ├── migrate_industrie.sql
-│   │       └── migrate_remove_raffinerie.sql
+│   │   └── schema.sql        # Vollständiges Datenbankschema (Tabellen + Seed-Daten)
 │   ├── src/                  # Anwendungsquellcode
 │   │   ├── index.js          # Einstiegspunkt – startet den HTTP-Server
 │   │   ├── app.js            # Express-App-Konfiguration (Middleware, Routen)

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Civil Wars – Bauzentrum</title>
+  <title>Civil Wars – Militär</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="game-page">
@@ -62,9 +62,9 @@
     <nav class="game-nav">
       <div class="nav-group">
         <a href="dashboard.html" class="nav-link">Übersicht</a>
-        <a href="bauzentrum.html" class="nav-link active">Bauzentrum</a>
+        <a href="bauzentrum.html" class="nav-link">Bauzentrum</a>
         <a href="#" class="nav-link">Union</a>
-        <a href="militaer.html" class="nav-link" id="navMilitaer">Militär</a>
+        <a href="militaer.html" class="nav-link active" id="navMilitaer">Militär</a>
         <a href="#" class="nav-link nav-italic">Geheimdienst</a>
         <a href="#" class="nav-link nav-italic">Forschung</a>
         <a href="#" class="nav-link nav-italic">Handelszentrum</a>
@@ -89,25 +89,19 @@
     <!-- Main Content -->
     <main class="game-main">
 
-      <!-- Current Buildings -->
-      <div class="game-panel">
-        <div class="game-panel-header">Meine Gebäude</div>
-        <div class="game-panel-body" id="meineGebaeudeListe">
-          <p class="empty-state">- Noch keine Gebäude gebaut! -</p>
+      <!-- Kaserne Status Panel -->
+      <div class="game-panel" id="kasernePanel">
+        <div class="game-panel-header">Kaserne</div>
+        <div class="game-panel-body" id="kaserneStatus">
+          <p class="empty-state">Lade Militärstatus …</p>
         </div>
       </div>
 
-      <!-- Build New Buildings -->
-      <div class="game-panel">
-        <div class="bau-tabs">
-          <button class="bau-tab active" data-kategorie="Unterkunft">Unterkünfte</button>
-          <button class="bau-tab" data-kategorie="Industrie">Industrie</button>
-          <button class="bau-tab" data-kategorie="Militär">Militär</button>
-          <button class="bau-tab" data-kategorie="Versorgung">Versorgung</button>
-          <button class="bau-tab" data-kategorie="Regierung">Regierung</button>
-        </div>
-        <div class="game-panel-body" id="buildingTypes">
-          <p class="empty-state">Lade Gebäudetypen …</p>
+      <!-- Einheiten ausbilden Panel -->
+      <div class="game-panel" id="einheitenPanel">
+        <div class="game-panel-header">Ausbilden / Produzieren</div>
+        <div class="game-panel-body" id="einheitenListe">
+          <p class="empty-state">Lade Einheitenübersicht …</p>
         </div>
       </div>
 
@@ -116,27 +110,6 @@
 
     <!-- Right Sidebar -->
     <aside class="game-sidebar">
-      <div class="sidebar-box">
-        <div class="sidebar-income-title">Einnahmen / Tick</div>
-        <table class="data-table">
-          <tr>
-            <td>Mieteinnahmen</td>
-            <td class="num-pos" id="einMieteinnahmen">0 €</td>
-          </tr>
-          <tr>
-            <td>Steuern</td>
-            <td class="num-pos" id="einSteuern">0 €</td>
-          </tr>
-          <tr>
-            <td>Sonstige</td>
-            <td class="num-pos" id="einBauzentrale">0 €</td>
-          </tr>
-          <tr class="total-row">
-            <td><strong>Gesamt</strong></td>
-            <td class="num-pos"><strong id="gesamtGeld">0 €</strong></td>
-          </tr>
-        </table>
-      </div>
       <div class="sidebar-box premium-box">
         <div class="premium-title">⭐ Premium</div>
         <p class="premium-desc">Werde Premium-Mitglied und erhalte zusätzliche Vorteile!</p>
@@ -153,5 +126,6 @@
 
   <script src="js/utils.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="js/militaer.js"></script>
 </body>
 </html>

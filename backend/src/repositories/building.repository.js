@@ -141,6 +141,16 @@ async function findFertigeBauauftraege(spielerId, client = pool) {
   return result.rows;
 }
 
+async function findExistingBauauftrag(spielerId, gebaeudeTypId, client = pool) {
+  const result = await client.query(
+    `SELECT id FROM bau_auftraege
+     WHERE spieler_id = $1 AND gebaeude_typ_id = $2 AND fertig_am > NOW()
+     LIMIT 1`,
+    [spielerId, gebaeudeTypId]
+  );
+  return result.rows[0] || null;
+}
+
 async function deleteBauauftrag(id, client = pool) {
   await client.query('DELETE FROM bau_auftraege WHERE id = $1', [id]);
 }
@@ -159,5 +169,6 @@ module.exports = {
   createBauauftrag,
   findBauauftraegeBySpielerId,
   findFertigeBauauftraege,
+  findExistingBauauftrag,
   deleteBauauftrag,
 };

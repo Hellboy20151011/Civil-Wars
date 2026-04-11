@@ -124,31 +124,42 @@ function clearBauQueueTimers() {
 }
 
 function renderBauWarteschlange(auftraege) {
-  const container = document.getElementById("bauWarteschlange");
-  if (!container) return;
+  /* Rendert die Bauwarteschlange in beide möglichen Container:
+     - #bauWarteschlange auf bauzentrum.html
+     - #auftragBauContent auf dashboard.html */
+  const queueContainer   = document.getElementById("bauWarteschlange");
+  const auftragContainer = document.getElementById("auftragBauContent");
+
+  if (!queueContainer && !auftragContainer) return;
 
   clearBauQueueTimers();
 
   if (!auftraege || auftraege.length === 0) {
-    container.innerHTML = '<span class="empty-state">Keine Gebäude in der Bauwarteschlange.</span>';
+    if (queueContainer)   queueContainer.innerHTML   = '<span class="empty-state">Keine Gebäude in der Bauwarteschlange.</span>';
+    if (auftragContainer) auftragContainer.innerHTML = '<span class="empty-state">- Kein Auftrag vorhanden -</span>';
     return;
   }
 
-  try {
-    container.innerHTML = auftraege
-      .map((a) => {
-        const countdownId = `countdown-${a.id}`;
-        return `
-          <div class="gebaeude-item bau-queue-item">
-            <span class="gebaeude-name">${escapeHtml(a.gebaeude_name)}</span>
-            <span class="gebaeude-info">&times; ${escapeHtml(String(a.anzahl))}</span>
-            <span class="bau-queue-countdown" id="${countdownId}">⏳ ${formatCountdown(a.fertig_am)}</span>
-          </div>
-        `;
-      })
-      .join("");
+  /* HTML für jeden Auftrag aufbauen */
+  const itemsHtml = auftraege
+    .map((a) => {
+      const countdownId = `countdown-${a.id}`;
+      return `
+        <div class="gebaeude-item bau-queue-item">
+          <span class="gebaeude-name">${escapeHtml(a.gebaeude_name)}</span>
+          <span class="gebaeude-info">&times; ${escapeHtml(String(a.anzahl))}</span>
+          <span class="bau-queue-countdown" id="${countdownId}">⏳ ${formatCountdown(a.fertig_am)}</span>
+        </div>
+      `;
+    })
+    .join("");
 
-    /* start countdown ticks */
+  try {
+    /* Beide Container befüllen (nur die, die auf der aktuellen Seite existieren) */
+    if (queueContainer)   queueContainer.innerHTML   = itemsHtml;
+    if (auftragContainer) auftragContainer.innerHTML = itemsHtml;
+
+    /* Countdown-Timer für jeden Auftrag starten */
     auftraege.forEach((a) => {
       const el = document.getElementById(`countdown-${a.id}`);
       if (!el) return;
@@ -157,7 +168,7 @@ function renderBauWarteschlange(auftraege) {
         if (remaining <= 0) {
           el.textContent = '✅ Fertig!';
           clearInterval(timer);
-          /* reload dashboard so completed buildings appear */
+          /* Dashboard neu laden, damit fertige Gebäude erscheinen */
           setTimeout(() => loadDashboard(), DASHBOARD_RELOAD_DELAY_MS);
         } else {
           el.textContent = `⏳ ${formatCountdown(a.fertig_am)}`;
@@ -203,16 +214,18 @@ async function loadBuildingTypes() {
 
   const allBuildingTypes = await response.json();
 
-  /* Spieler-Ressourcen und Gebäude für Zähler */
+  /* Spieler-Ressourcen, Gebäude und aktive Warteschlange für Berechnungen */
   let spielerGebaeude = [];
   let ressourcen = null;
   let stromFrei = 0;
+  let aktiveQueue = [];
   const statusRes = await fetch("/api/me");
   if (statusRes.ok) {
     const statusData = await statusRes.json();
     spielerGebaeude = statusData.gebaeude || [];
     ressourcen = statusData.ressourcen || null;
     stromFrei = statusData.strom ? Number(statusData.strom.frei) : 0;
+    aktiveQueue = statusData.bauauftraege || [];
   }
 
   /* Aktive Kategorie ermitteln */
@@ -230,6 +243,11 @@ async function loadBuildingTypes() {
     .map((building) => {
       const gebaut = spielerGebaeude.find((g) => Number(g.id) === Number(building.id));
       const anzahlGebaut = gebaut ? Number(gebaut.anzahl) : 0;
+
+      /* Prüfe, ob dieses Gebäude bereits aktiv in der Warteschlange ist */
+      const bereitsInQueue = aktiveQueue.some(
+        (a) => Number(a.gebaeude_typ_id) === Number(building.id) && new Date(a.fertig_am) > new Date()
+      );
 
       /* Berechne wie viele Gebäude derzeit baubar sind */
       let derzeit = 0;
@@ -305,7 +323,7 @@ async function loadBuildingTypes() {
               </table>
               <table class="bau-cost-table bau-cost-table-sm">
                 <tr><td>Bereits gebaut</td><td>${escapeHtml(String(anzahlGebaut))} Stück</td></tr>
-                <tr><td>Derzeit baubar</td><td>${escapeHtml(String(derzeit))} Stück</td></tr>
+                <tr><td>Derzeit baubar</td><td>${bereitsInQueue ? 'In Warteschlange' : escapeHtml(String(derzeit)) + ' Stück'}</td></tr>
               </table>
             </div>
             <div class="bau-card-img">
@@ -317,12 +335,12 @@ async function loadBuildingTypes() {
                   class="bau-anzahl-input"
                   min="1"
                   max="${derzeit}"
-                  value="${derzeit === 0 ? 0 : 1}"
-                  ${derzeit === 0 ? "disabled" : ""}
+                  value="${derzeit === 0 || bereitsInQueue ? 0 : 1}"
+                  ${derzeit === 0 || bereitsInQueue ? "disabled" : ""}
                 >
-                <button class="bau-btn-bauen" onclick="buildBuilding(${parseInt(building.id, 10)})" ${derzeit === 0 ? "disabled" : ""}>Bauen</button>
+                <button class="bau-btn-bauen" onclick="buildBuilding(${parseInt(building.id, 10)})" ${derzeit === 0 || bereitsInQueue ? "disabled" : ""}>Bauen</button>
               </div>
-              <p class="bau-anzahl-max">${escapeHtml(String(derzeit))} maximal</p>
+              <p class="bau-anzahl-max">${bereitsInQueue ? 'Bereits in Warteschlange' : escapeHtml(String(derzeit)) + ' maximal'}</p>
             </div>
           </div>
         </div>

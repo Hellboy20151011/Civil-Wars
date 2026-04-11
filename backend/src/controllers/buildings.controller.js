@@ -121,6 +121,13 @@ async function build(req, res) {
     const label = anzahl > 1 ? `${anzahl}x ${gebaeude.name}` : gebaeude.name;
 
     if (Number(gebaeude.bauzeit_minuten) > 0) {
+      /* Prüfen ob dieses Gebäude bereits in der Warteschlange ist */
+      const existingOrder = await buildingRepo.findExistingBauauftrag(spielerId, gebaeudeTypId, client);
+      if (existingOrder) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ message: `${gebaeude.name} ist bereits in der Bauwarteschlange. Erst abwarten, bis der aktuelle Auftrag fertig ist.` });
+      }
+
       const auftrag = await buildingRepo.createBauauftrag(spielerId, gebaeudeTypId, anzahl, gebaeude.bauzeit_minuten, client);
 
       const statusNeu = await playerService.getSpielerStatus(spielerId, client);

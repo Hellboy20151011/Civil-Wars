@@ -1,0 +1,21 @@
+.gitignore
+
+# Node.js artifacts
+node_modules/
+backend/node_modules/
+
+# Logs
+logs/
+*.log
+
+# dotenv files
+.env
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+*.swp
+
+# Common build outputs
+/dist/
+/build/

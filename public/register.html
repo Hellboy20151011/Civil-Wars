@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registrierung</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Registrierung</h2>
+
+    <form id="registerForm">
+      <input type="text" id="name" placeholder="Spielername" required />
+      <input type="email" id="email" placeholder="E-Mail" required />
+      <input type="password" id="passwort" placeholder="Passwort" required />
+      <button type="submit">Registrieren</button>
+    </form>
+
+    <div class="message" id="message"></div>
+
+    <p style="text-align:center;">
+      Bereits registriert? <a href="/login.html">Zum Login</a>
+    </p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

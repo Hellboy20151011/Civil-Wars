@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Login</h2>
+
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="E-Mail" required />
+      <input type="password" id="passwort" placeholder="Passwort" required />
+      <button type="submit">Einloggen</button>
+    </form>
+
+    <div class="message" id="message"></div>
+
+    <p style="text-align:center;">
+      Noch kein Konto? <a href="/register.html">Jetzt registrieren</a>
+    </p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

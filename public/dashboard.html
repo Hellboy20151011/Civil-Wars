@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="nav">
+    <div><strong>Civil-Wars Dashboard</strong></div>
+    <button id="logoutBtn" style="width:auto; padding:10px 20px;">Logout</button>
+  </div>
+
+  <div class="dashboard">
+    <div class="card">
+      <h2>Spieler</h2>
+      <p><strong>Name:</strong> <span id="spielerName"></span></p>
+      <p><strong>E-Mail:</strong> <span id="spielerEmail"></span></p>
+    </div>
+
+    <div class="card">
+      <h2>Ressourcen</h2>
+      <div class="resources">
+        <div class="resource-box">Geld<br><strong id="geld"></strong></div>
+        <div class="resource-box">Stein<br><strong id="stein"></strong></div>
+        <div class="resource-box">Eisen<br><strong id="eisen"></strong></div>
+        <div class="resource-box">Strom<br><strong id="strom"></strong></div>
+        <div class="resource-box">Treibstoff<br><strong id="treibstoff"></strong></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

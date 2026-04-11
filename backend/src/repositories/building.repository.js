@@ -107,6 +107,44 @@ async function findKaserneStufenById(stufe, client = pool) {
   return result.rows[0] || null;
 }
 
+async function createBauauftrag(spielerId, gebaeudeTypId, anzahl, bauzeit_minuten, client = pool) {
+  const result = await client.query(
+    `INSERT INTO bau_auftraege (spieler_id, gebaeude_typ_id, anzahl, fertig_am)
+     VALUES ($1, $2, $3, NOW() + ($4 || ' minutes')::INTERVAL)
+     RETURNING *`,
+    [spielerId, gebaeudeTypId, anzahl, bauzeit_minuten]
+  );
+  return result.rows[0];
+}
+
+async function findBauauftraegeBySpielerId(spielerId, client = pool) {
+  const result = await client.query(
+    `SELECT ba.id, ba.spieler_id, ba.gebaeude_typ_id, ba.anzahl,
+            ba.begonnen_am, ba.fertig_am, gt.name AS gebaeude_name
+     FROM bau_auftraege ba
+     JOIN gebaeude_typen gt ON gt.id = ba.gebaeude_typ_id
+     WHERE ba.spieler_id = $1
+     ORDER BY ba.fertig_am`,
+    [spielerId]
+  );
+  return result.rows;
+}
+
+async function findFertigeBauauftraege(spielerId, client = pool) {
+  const result = await client.query(
+    `SELECT ba.id, ba.spieler_id, ba.gebaeude_typ_id, ba.anzahl
+     FROM bau_auftraege ba
+     WHERE ba.spieler_id = $1 AND ba.fertig_am <= NOW()
+     ORDER BY ba.fertig_am`,
+    [spielerId]
+  );
+  return result.rows;
+}
+
+async function deleteBauauftrag(id, client = pool) {
+  await client.query('DELETE FROM bau_auftraege WHERE id = $1', [id]);
+}
+
 module.exports = {
   findAllTypes,
   findTypById,
@@ -118,4 +156,8 @@ module.exports = {
   upsertSpielerGebaeude,
   findKaserneStufen,
   findKaserneStufenById,
+  createBauauftrag,
+  findBauauftraegeBySpielerId,
+  findFertigeBauauftraege,
+  deleteBauauftrag,
 };

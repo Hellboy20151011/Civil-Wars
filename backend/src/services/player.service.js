@@ -2,6 +2,7 @@
 
 const config = require('../config');
 const playerRepo = require('../repositories/player.repository');
+const buildingRepo = require('../repositories/building.repository');
 const economyService = require('./economy.service');
 
 async function getSpielerStatus(spielerId, client) {
@@ -11,7 +12,11 @@ async function getSpielerStatus(spielerId, client) {
     throw new Error('Spieler nicht gefunden');
   }
 
+  await economyService.processFertigeBauauftraege(spielerId, client);
+
   const tickStatus = await economyService.applyProductionTicks(spielerId, client);
+
+  const bauauftraege = await buildingRepo.findBauauftraegeBySpielerId(spielerId, client);
 
   return {
     id: spieler.id,
@@ -25,6 +30,7 @@ async function getSpielerStatus(spielerId, client) {
     einnahmen: tickStatus.einnahmen,
     produktion: tickStatus.produktion,
     gebaeude: tickStatus.gebaeude,
+    bauauftraege,
     ticksVerrechnet: tickStatus.ticks,
     tickDauerSekunden: config.tickDurationSeconds,
     letzteAktualisierung: tickStatus.letzteAktualisierung,

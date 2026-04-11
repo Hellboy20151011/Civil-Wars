@@ -839,3 +839,16 @@ a {
   flex-direction: column;
   gap: 6px;
 }
+
+
+.bau-queue-item {
+  align-items: center;
+}
+
+.bau-queue-countdown {
+  color: #f0c040;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: auto;
+  white-space: nowrap;
+}

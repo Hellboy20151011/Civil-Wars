@@ -17,6 +17,8 @@ const buildSchema = z.object({
 
 router.get('/types', requireLogin, apiLimiter, asyncWrapper(buildingsController.getTypes));
 
+router.get('/queue', requireLogin, apiLimiter, asyncWrapper(buildingsController.getQueue));
+
 router.post(
   '/build',
   requireLogin,

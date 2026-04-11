@@ -2,20 +2,12 @@
 
 const { Router } = require('express');
 const { z } = require('zod');
-const rateLimit = require('express-rate-limit');
 const authController = require('../controllers/auth.controller');
+const { authLimiter } = require('../middleware/rateLimiters');
 const { validateBody } = require('../middleware/validate');
 const { asyncWrapper } = require('../middleware/asyncWrapper');
 
 const router = Router();
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { message: 'Zu viele Anfragen. Bitte versuche es später erneut.' },
-});
 
 const registerSchema = z.object({
   name: z.string().min(1, 'Name darf nicht leer sein'),

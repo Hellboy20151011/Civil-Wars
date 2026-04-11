@@ -20,7 +20,21 @@ async function register(req, res) {
     }
 
     const hash = await bcrypt.hash(passwort, 10);
-    const spieler = await playerRepo.create(name, email, hash, client);
+
+    let koordinateX, koordinateY;
+    const MAX_RETRIES = 1000;
+    let versuche = 0;
+    do {
+      if (versuche >= MAX_RETRIES) {
+        await client.query('ROLLBACK');
+        return res.status(503).json({ message: 'Kein freier Koordinatenplatz verfügbar' });
+      }
+      koordinateX = Math.floor(Math.random() * 999) + 1;
+      koordinateY = Math.floor(Math.random() * 999) + 1;
+      versuche++;
+    } while (await playerRepo.findByKoordinaten(koordinateX, koordinateY, client));
+
+    const spieler = await playerRepo.create(name, email, hash, koordinateX, koordinateY, client);
 
     await resourcesRepo.initForSpieler(spieler.id, client);
 

@@ -17,6 +17,8 @@ async function getSpielerStatus(spielerId, client) {
     id: spieler.id,
     name: spieler.name,
     email: spieler.email,
+    koordinate_x: spieler.koordinate_x,
+    koordinate_y: spieler.koordinate_y,
     ressourcen: tickStatus.ressourcen,
     bewohner: tickStatus.bewohner,
     strom: tickStatus.strom,

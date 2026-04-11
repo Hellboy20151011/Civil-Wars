@@ -3,7 +3,10 @@ CREATE TABLE IF NOT EXISTS spieler (
     name VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     passwort_hash TEXT NOT NULL,
-    erstellt_am TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    erstellt_am TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    koordinate_x INTEGER,
+    koordinate_y INTEGER,
+    UNIQUE (koordinate_x, koordinate_y)
 );
 
 CREATE TABLE IF NOT EXISTS spieler_ressourcen (

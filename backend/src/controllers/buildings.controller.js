@@ -33,6 +33,20 @@ async function build(req, res) {
       return res.status(400).json({ message: 'Hauptgebäude kann nicht gebaut werden' });
     }
 
+    if (gebaeude.name === 'Öl-Raffinerie') {
+      const bohrturmAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Bohrturm', client);
+      const raffinerieAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Öl-Raffinerie', client);
+      const maxRaffinerie = bohrturmAnzahl * 5;
+      if (raffinerieAnzahl + anzahl > maxRaffinerie) {
+        await client.query('ROLLBACK');
+        if (bohrturmAnzahl === 0) {
+          return res.status(400).json({ message: 'Du musst zuerst einen Bohrturm bauen, um Öl-Raffinerien bauen zu können.' });
+        }
+        const bohrturmLabel = bohrturmAnzahl === 1 ? '1 Bohrturm' : `${bohrturmAnzahl} Bohrtürme`;
+        return res.status(400).json({ message: `Maximal ${maxRaffinerie} Öl-Raffinerie(n) erlaubt (5 pro Bohrturm). Du hast ${bohrturmLabel}.` });
+      }
+    }
+
     const ressourcen = await resourcesRepo.findBySpielerIdLocked(spielerId, client);
     if (!ressourcen) {
       await client.query('ROLLBACK');

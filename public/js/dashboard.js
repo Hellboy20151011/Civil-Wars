@@ -155,6 +155,13 @@ async function loadBuildingTypes() {
         const maxStrom = Number(building.strom_verbrauch)  > 0 ? Math.floor(stromFrei               / Number(building.strom_verbrauch))  : Infinity;
         const finite   = [maxGeld, maxStein, maxEisen, maxStrom].filter((v) => v !== Infinity);
         derzeit = finite.length > 0 ? Math.max(0, Math.min(...finite)) : 0;
+
+        if (building.name === 'Öl-Raffinerie') {
+          const bohrturmGebaut = spielerGebaeude.find((g) => g.name === 'Bohrturm');
+          const bohrturmAnzahl = bohrturmGebaut ? Number(bohrturmGebaut.anzahl) : 0;
+          const maxDurchBohrturm = Math.max(0, bohrturmAnzahl * 5 - anzahlGebaut);
+          derzeit = Math.min(derzeit, maxDurchBohrturm);
+        }
       }
 
       /* Beschreibung dynamisch aus Datenbankfeldern erzeugen */

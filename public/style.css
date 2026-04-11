@@ -5,6 +5,461 @@ body {
   color: #fff;
 }
 
+/* ── Game Page Layout ──────────────────────────────────────── */
+
+.game-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #1c1f26;
+}
+
+/* Header */
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0e1015;
+  border-bottom: 2px solid #3a3f4a;
+  padding: 6px 16px;
+  font-size: 13px;
+  gap: 10px;
+}
+
+.header-clock,
+.header-tick {
+  font-size: 13px;
+  color: #aaa;
+  min-width: 60px;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.header-info {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.header-val {
+  color: #7cc8ff;
+  font-weight: bold;
+}
+
+/* Resource Bar */
+.resource-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: #13161c;
+  border-bottom: 2px solid #3a3f4a;
+  padding: 7px 20px;
+  flex-wrap: wrap;
+}
+
+.res-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 14px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.res-icon {
+  font-size: 15px;
+}
+
+.res-separator {
+  width: 1px;
+  height: 20px;
+  background: #3a3f4a;
+}
+
+/* Three-column layout */
+.game-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Left nav */
+.game-nav {
+  width: 160px;
+  min-width: 160px;
+  background: #1a1d24;
+  border-right: 1px solid #2e3340;
+  padding: 8px 0;
+  flex-shrink: 0;
+}
+
+.nav-group {
+  padding: 4px 0;
+  border-bottom: 1px solid #2e3340;
+  margin-bottom: 4px;
+}
+
+.nav-group:last-child {
+  border-bottom: none;
+}
+
+.nav-link {
+  display: block;
+  padding: 4px 14px;
+  color: #bbb;
+  text-decoration: none;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-link:hover {
+  background: #252930;
+  color: #fff;
+}
+
+.nav-link.active {
+  color: #fff;
+  font-weight: bold;
+  background: #252930;
+}
+
+.nav-italic {
+  font-style: italic;
+  color: #888;
+}
+
+.nav-label {
+  display: block;
+  padding: 4px 14px;
+  font-size: 13px;
+  color: #888;
+  font-weight: bold;
+}
+
+/* Main content */
+.game-main {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* Game panels */
+.game-panel {
+  background: #23272f;
+  border: 1px solid #3a3f4a;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.game-panel-header {
+  background: #1a1d24;
+  border-bottom: 1px solid #3a3f4a;
+  padding: 6px 12px;
+  font-weight: bold;
+  font-size: 13px;
+  color: #ddd;
+  border-radius: 4px 4px 0 0;
+}
+
+.game-panel-body {
+  padding: 10px 12px;
+}
+
+/* Two-column sub-grid */
+.main-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* General panel */
+.general-layout {
+  display: flex;
+  gap: 10px;
+}
+
+.general-avatar {
+  flex-shrink: 0;
+}
+
+.avatar-icon {
+  width: 80px;
+  height: 100px;
+  background: #353b46;
+  border: 1px solid #3a3f4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  border-radius: 4px;
+  color: #888;
+}
+
+.general-stats {
+  flex: 1;
+  font-size: 12px;
+}
+
+.stat-heading {
+  font-weight: bold;
+  margin-top: 6px;
+  margin-bottom: 2px;
+  font-size: 12px;
+  text-decoration: underline;
+  color: #ddd;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 1px 0;
+}
+
+.stat-label {
+  color: #bbb;
+}
+
+.stat-val {
+  color: #7cc8ff;
+  font-weight: bold;
+}
+
+.exp-container {
+  margin-top: 6px;
+}
+
+.exp-label {
+  font-size: 11px;
+  color: #aaa;
+}
+
+.exp-bar {
+  height: 10px;
+  background: #353b46;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 3px 0;
+}
+
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(to right, #c00, #f44);
+  border-radius: 5px;
+  transition: width 0.3s;
+}
+
+.exp-text {
+  font-size: 11px;
+  color: #888;
+}
+
+/* Aufträge */
+.auftrag-block {
+  border-bottom: 1px solid #2e3340;
+}
+
+.auftrag-block:last-child {
+  border-bottom: none;
+}
+
+.auftrag-type {
+  padding: 5px 12px;
+  font-size: 13px;
+  color: #ccc;
+  background: #1e2229;
+  border-bottom: 1px solid #2e3340;
+}
+
+.auftrag-content {
+  padding: 6px 12px;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Finance / data tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.data-table td {
+  padding: 3px 4px;
+  color: #ccc;
+}
+
+.data-table td:first-child {
+  color: #aaa;
+}
+
+.num-pos {
+  color: #4caf50;
+  text-align: right;
+}
+
+.num-neg {
+  color: #e57373;
+  text-align: right;
+}
+
+.total-row td {
+  border-top: 1px solid #3a3f4a;
+  padding-top: 5px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+/* Empty state text */
+.empty-state {
+  color: #666;
+  font-size: 12px;
+  text-align: center;
+  display: block;
+  padding: 8px 0;
+}
+
+.empty-state-sm {
+  color: #666;
+  font-size: 11px;
+  text-align: center;
+  margin: 6px 0;
+}
+
+/* Buildings list */
+.gebaeude-item {
+  background: #2a2f38;
+  border: 1px solid #3a3f4a;
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.gebaeude-name {
+  font-weight: bold;
+  color: #ddd;
+}
+
+.gebaeude-info {
+  color: #aaa;
+}
+
+.gebaeude-strom {
+  color: #f0c040;
+}
+
+/* Building type cards (Bauzentrum) */
+.building-item {
+  background: #2a2f38;
+  border: 1px solid #3a3f4a;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.building-item button {
+  margin-top: 8px;
+  width: auto;
+  padding: 6px 14px;
+  font-size: 12px;
+  background: #3a6f3a;
+}
+
+.building-item button:hover {
+  background: #4a8f4a;
+}
+
+/* Right sidebar */
+.game-sidebar {
+  width: 200px;
+  min-width: 200px;
+  padding: 10px;
+  background: #1a1d24;
+  border-left: 1px solid #2e3340;
+  flex-shrink: 0;
+}
+
+.sidebar-box {
+  background: #23272f;
+  border: 1px solid #3a3f4a;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.premium-title {
+  font-weight: bold;
+  font-size: 13px;
+  color: #f0c040;
+  margin-bottom: 6px;
+}
+
+.premium-desc {
+  font-size: 11px;
+  color: #aaa;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.btn-premium {
+  width: 100%;
+  padding: 6px;
+  font-size: 12px;
+  background: #4a4a1a;
+  border: 1px solid #888820;
+  color: #f0c040;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-premium:hover {
+  background: #5a5a2a;
+}
+
+.buddy-title {
+  font-weight: bold;
+  font-size: 13px;
+  color: #ddd;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.buddy-icon {
+  color: #4caf50;
+}
+
+.btn-buddy {
+  width: 100%;
+  padding: 6px;
+  font-size: 12px;
+  background: #2a3a2a;
+  border: 1px solid #4caf50;
+  color: #4caf50;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.btn-buddy:hover {
+  background: #3a4f3a;
+}
+
 .container {
   max-width: 500px;
   margin: 60px auto;

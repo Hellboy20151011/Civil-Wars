@@ -75,7 +75,7 @@ function renderKaserneStatus(data, container) {
     <div class="mil-kaserne-status">
       <div class="mil-stufe-row">
         <span class="mil-stufe-label">Aktuelle Stufe:</span>
-        <span class="mil-stufe-val">Stufe ${kaserneStufe} von ${maxStufe} &nbsp; ${escapeHtml(stufenSterne)}</span>
+        <span class="mil-stufe-val">Stufe ${kaserneStufe} von ${maxStufe} &nbsp; ${stufenSterne}</span>
       </div>
       ${upgradeHtml}
     </div>`;

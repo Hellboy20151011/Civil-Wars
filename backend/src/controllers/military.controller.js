@@ -100,7 +100,7 @@ async function upgradeKaserne(req, res) {
       Number(upgradeKosten.kosten_geld),
       Number(upgradeKosten.kosten_stein),
       Number(upgradeKosten.kosten_eisen),
-      0,
+      0, /* Kaserne-Upgrades kosten keinen Treibstoff */
       client
     );
 
@@ -174,7 +174,7 @@ async function trainEinheit(req, res) {
       return res.status(400).json({ message: 'Zu wenig Eisen.' });
     }
 
-    await resourcesRepo.deductResources(spielerId, gesamtGeld, gesamtStein, gesamtEisen, 0, client);
+    await resourcesRepo.deductResources(spielerId, gesamtGeld, gesamtStein, gesamtEisen, 0 /* kein Treibstoff */, client);
     await einheitenRepo.upsertSpielerEinheiten(spielerId, einheitTypId, anzahl, client);
 
     const statusNeu = await playerService.getSpielerStatus(spielerId, client);

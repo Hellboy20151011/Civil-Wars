@@ -6,9 +6,8 @@
 /* ── Militär-Navigationslink aktualisieren ─────────────────── */
 
 function updateMilitaerNav(gebaeude) {
-  const militaerKategorien = ['Militär'];
   const hasMilitaer = gebaeude && gebaeude.some(
-    (g) => militaerKategorien.includes(g.kategorie) && Number(g.anzahl) > 0
+    (g) => g.kategorie === 'Militär' && Number(g.anzahl) > 0
   );
   const navMilitaer = document.getElementById('navMilitaer');
   if (navMilitaer) {

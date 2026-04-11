@@ -40,7 +40,7 @@ async function register(req, res) {
 
     const hauptgebaeude = await buildingRepo.findHauptgebaeude(client);
     if (hauptgebaeude) {
-      await buildingRepo.upsertSpielerGebaeude(spieler.id, hauptgebaeude.id, client);
+      await buildingRepo.upsertSpielerGebaeude(spieler.id, hauptgebaeude.id, 1, client);
     }
 
     await client.query('COMMIT');

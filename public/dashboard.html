@@ -3,69 +3,276 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard</title>
+  <title>Civil Wars – Übersicht</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <div class="nav">
-    <div><strong>Civil-Wars Dashboard</strong></div>
-    <button id="logoutBtn" style="width:auto; padding:10px 20px;">Logout</button>
+<body class="game-page">
+
+  <!-- Top Header Bar -->
+  <div class="game-header">
+    <div class="header-clock" id="headerTime">--:--:--</div>
+    <div class="header-center">
+      <div class="header-info">
+        <span>Name: <span id="spielerName" class="header-val">-</span></span>
+        <span>Koord.: <span class="header-val">-:-</span></span>
+        <span>Wetter: <span class="header-val">-</span></span>
+        <span>Punkte: <span class="header-val" id="spielerPunkte">0 (#)</span></span>
+      </div>
+    </div>
+    <div class="header-tick" id="nextTickTimer">--:--</div>
   </div>
 
-  <div class="dashboard">
-    <div class="card">
-      <h2>Spieler</h2>
-      <p><strong>Name:</strong> <span id="spielerName"></span></p>
-      <p><strong>E-Mail:</strong> <span id="spielerEmail"></span></p>
+  <!-- Resource Bar -->
+  <div class="resource-bar">
+    <div class="res-item">
+      <span class="res-icon">💰</span>
+      <span id="geld">0</span>
     </div>
+    <div class="res-separator"></div>
+    <div class="res-item">
+      <span class="res-icon">🪨</span>
+      <span id="stein">0</span>
+    </div>
+    <div class="res-separator"></div>
+    <div class="res-item">
+      <span class="res-icon">⚙️</span>
+      <span id="eisen">0</span>
+    </div>
+    <div class="res-separator"></div>
+    <div class="res-item">
+      <span class="res-icon">⛽</span>
+      <span id="treibstoff">0</span>
+    </div>
+    <div class="res-separator"></div>
+    <div class="res-item">
+      <span class="res-icon">⚡</span>
+      <span id="stromFrei">0</span>
+    </div>
+  </div>
 
-    <div class="card">
-      <h2>Ressourcen</h2>
-      <div class="resources">
-        <div class="resource-box">Geld<br><strong id="geld"></strong></div>
-        <div class="resource-box">Stein<br><strong id="stein"></strong></div>
-        <div class="resource-box">Eisen<br><strong id="eisen"></strong></div>
-        <div class="resource-box">Treibstoff<br><strong id="treibstoff"></strong></div>
+  <!-- Main Game Layout: Nav | Content | Sidebar -->
+  <div class="game-layout">
+
+    <!-- Left Navigation Sidebar -->
+    <nav class="game-nav">
+      <div class="nav-group">
+        <a href="dashboard.html" class="nav-link active">Übersicht</a>
+        <a href="bauzentrum.html" class="nav-link">Bauzentrum</a>
+        <a href="#" class="nav-link">Union</a>
+        <a href="#" class="nav-link">Militär</a>
+        <a href="#" class="nav-link nav-italic">Geheimdienst</a>
+        <a href="#" class="nav-link nav-italic">Forschung</a>
+        <a href="#" class="nav-link nav-italic">Handelszentrum</a>
+        <a href="#" class="nav-link nav-italic">Bank</a>
+        <a href="#" class="nav-link nav-italic">Wetterstation</a>
+        <a href="#" class="nav-link nav-italic">Recyclinghof</a>
+        <a href="#" class="nav-link nav-italic">Pipeline</a>
       </div>
-    </div>
-
-    <div class="card">
-      <h2>Strom</h2>
-      <div class="resources">
-        <div class="resource-box">Produktion<br><strong id="stromProduktion"></strong></div>
-        <div class="resource-box">Verbrauch<br><strong id="stromVerbrauch"></strong></div>
-        <div class="resource-box">Frei<br><strong id="stromFrei"></strong></div>
+      <div class="nav-group">
+        <a href="#" class="nav-link">Highscore</a>
+        <a href="#" class="nav-link">Suche</a>
+        <a href="#" class="nav-link">✉ Nachrichten</a>
+        <a href="#" class="nav-link">Profil</a>
+        <a href="#" class="nav-link" id="logoutBtn">Logout</a>
       </div>
-    </div>
-
-    <div class="card">
-      <h2>Produktion pro Tick</h2>
-      <div class="resources">
-        <div class="resource-box">Geld<br><strong id="prodGeld"></strong></div>
-        <div class="resource-box">Stein<br><strong id="prodStein"></strong></div>
-        <div class="resource-box">Eisen<br><strong id="prodEisen"></strong></div>
-        <div class="resource-box">Treibstoff<br><strong id="prodTreibstoff"></strong></div>
+      <div class="nav-group">
+        <span class="nav-label">Chat</span>
+        <a href="#" class="nav-link">Forum</a>
       </div>
-    </div>
+    </nav>
 
-    <div class="card">
-      <h2>Deine Gebäude</h2>
-      <div id="meineGebaeudeListe"></div>
-    </div>
+    <!-- Main Content -->
+    <main class="game-main">
 
-    <div class="card">
-      <h2>Gebäude bauen</h2>
-      <div id="buildingTypes"></div>
-    </div>
+      <!-- Top row: Buildings | General -->
+      <div class="main-grid-2">
 
-    <div class="card">
-      <h2>Tick-System</h2>
-      <p><strong>Tickdauer:</strong> <span id="tickDauer"></span> Sekunden</p>
-      <p><strong>Zuletzt verrechnete Ticks:</strong> <span id="ticksVerrechnet"></span></p>
-      <p><strong>Letzte Aktualisierung:</strong> <span id="letzteAktualisierung"></span></p>
-    </div>
+        <!-- Buildings Panel -->
+        <div class="game-panel">
+          <div class="game-panel-header">Gebäude</div>
+          <div class="game-panel-body" id="meineGebaeudeListe">
+            <p class="empty-state">- Noch keine Gebäude gebaut! -</p>
+          </div>
+        </div>
 
-    <div class="message" id="message"></div>
+        <!-- General Panel -->
+        <div class="game-panel">
+          <div class="game-panel-header">General</div>
+          <div class="game-panel-body general-layout">
+            <div class="general-avatar">
+              <div class="avatar-icon">👤</div>
+            </div>
+            <div class="general-stats">
+              <div class="stat-row">
+                <span class="stat-label">Dienstgrad</span>
+                <span class="stat-val">Rekrut</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Level</span>
+                <span class="stat-val">0</span>
+              </div>
+              <div class="stat-heading">Fähigkeiten</div>
+              <div class="stat-row"><span class="stat-label">Kriegsführung</span><span class="stat-val">0</span></div>
+              <div class="stat-row"><span class="stat-label">Angriff</span><span class="stat-val">0</span></div>
+              <div class="stat-row"><span class="stat-label">Verteidigung</span><span class="stat-val">0</span></div>
+              <div class="stat-row"><span class="stat-label">Bau</span><span class="stat-val">0</span></div>
+              <div class="stat-row"><span class="stat-label">Forschung</span><span class="stat-val">0</span></div>
+              <div class="stat-row"><span class="stat-label">Spionage</span><span class="stat-val">0</span></div>
+              <div class="exp-container">
+                <span class="exp-label">Erfahrung</span>
+                <div class="exp-bar">
+                  <div class="exp-fill" style="width: 0%"></div>
+                </div>
+                <span class="exp-text">0 / 100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Aufträge Panel -->
+      <div class="game-panel">
+        <div class="game-panel-header">Aufträge</div>
+        <div class="auftrag-block">
+          <div class="auftrag-type">Bau &amp; Ausbau</div>
+          <div class="auftrag-content"><span class="empty-state">- Kein Auftrag vorhanden -</span></div>
+        </div>
+        <div class="auftrag-block">
+          <div class="auftrag-type">Einheiten &amp; Verteidigung</div>
+          <div class="auftrag-content"><span class="empty-state">- Kein Auftrag vorhanden -</span></div>
+        </div>
+        <div class="auftrag-block">
+          <div class="auftrag-type">Forschung</div>
+          <div class="auftrag-content"><span class="empty-state">- Kein Auftrag vorhanden -</span></div>
+        </div>
+        <div class="auftrag-block">
+          <div class="auftrag-type">Handel</div>
+          <div class="auftrag-content"><span class="empty-state">- Kein Auftrag vorhanden -</span></div>
+        </div>
+      </div>
+
+      <!-- Bottom row: Income/Expenses | Server Info -->
+      <div class="main-grid-2">
+
+        <!-- Einnahmen & Ausgaben -->
+        <div class="game-panel">
+          <div class="game-panel-header">Einnahmen &amp; Ausgaben</div>
+          <div class="game-panel-body">
+            <table class="data-table">
+              <tr>
+                <td>Bauzentrale</td>
+                <td class="num-pos" id="einBauzentrale">0 €</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Mieteinnahmen</td>
+                <td class="num-pos">0 €</td>
+                <td>0 %</td>
+              </tr>
+              <tr>
+                <td>Steuereinnahmen</td>
+                <td class="num-pos">0 €</td>
+                <td>10 %</td>
+              </tr>
+              <tr>
+                <td>Armeekosten</td>
+                <td class="num-neg">-0 €</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Instandhaltung</td>
+                <td class="num-neg">-0 €</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Geheimdienst</td>
+                <td class="num-neg">-0 €</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Unions-Kasse</td>
+                <td class="num-neg">-0 €</td>
+                <td>0 %</td>
+              </tr>
+              <tr class="total-row">
+                <td><strong><u>Gesamt</u></strong></td>
+                <td class="num-pos"><strong id="gesamtGeld">0 €</strong></td>
+                <td></td>
+              </tr>
+            </table>
+            <table class="data-table mt-10">
+              <tr>
+                <td>Stein</td>
+                <td id="prodStein">0 t</td>
+                <td>0 %</td>
+              </tr>
+              <tr>
+                <td>Eisen</td>
+                <td id="prodEisen">0 t</td>
+                <td>0 %</td>
+              </tr>
+              <tr>
+                <td>Treibstoff</td>
+                <td id="prodTreibstoff">0 Barrel</td>
+                <td>0 %</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Serverinfos -->
+        <div class="game-panel">
+          <div class="game-panel-header">Serverinfos</div>
+          <div class="game-panel-body">
+            <table class="data-table">
+              <tr>
+                <td>Servername</td>
+                <td>Civil-Wars Server</td>
+              </tr>
+              <tr>
+                <td>Server-Geschwindigkeit</td>
+                <td>1-fach</td>
+              </tr>
+              <tr>
+                <td>Tick</td>
+                <td><span id="tickDauer">-</span> Sekunden</td>
+              </tr>
+              <tr>
+                <td>Tick-Multiplikator</td>
+                <td>1-fach</td>
+              </tr>
+              <tr>
+                <td>Letzter Tick</td>
+                <td id="letzteAktualisierung">-</td>
+              </tr>
+              <tr>
+                <td>Letzter Login</td>
+                <td id="letzterLogin">-</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="message" id="message"></div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="game-sidebar">
+      <div class="sidebar-box premium-box">
+        <div class="premium-title">⭐ Premium</div>
+        <p class="premium-desc">Werde Premium-Mitglied und erhalte zusätzliche Vorteile!</p>
+        <button class="btn-premium">Mehr Infos</button>
+      </div>
+      <div class="sidebar-box buddy-box">
+        <div class="buddy-title">Buddyliste <span class="buddy-icon">↑</span></div>
+        <p class="empty-state-sm">Keine Spieler in der Buddyliste.</p>
+        <button class="btn-buddy">Spieler hinzufügen</button>
+      </div>
+    </aside>
+
   </div>
 
   <script src="app.js"></script>

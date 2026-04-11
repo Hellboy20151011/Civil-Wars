@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Civil Wars – Bauzentrum</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="game-page">
+
+  <!-- Top Header Bar -->
+  <div class="game-header">
+    <div class="header-clock" id="headerTime">--:--:--</div>
+    <div class="header-center">
+      <div class="header-info">
+        <span>Name: <span id="spielerName" class="header-val">-</span></span>
+        <span>Koord.: <span class="header-val">-:-</span></span>
+        <span>Wetter: <span class="header-val">-</span></span>
+        <span>Punkte: <span class="header-val" id="spielerPunkte">0 (#)</span></span>
+      </div>
+    </div>
+    <div class="header-tick" id="nextTickTimer">--:--</div>
+  </div>
+
+  <!-- Resource Bar -->
+  <div class="resource-bar">
+    <div class="res-item">
+      <span class="res-icon">💰</span>
+      <span id="geld">0</span>
+    </div>
+    <div class="res-separator"></div>
+    <div class="res-item">
+      <span class="res-icon">🪨</span>
+      <span id="stein">0</span>
+    </div>
+    <div class="res-separator"></div>
+    <div class="res-item">
+      <span class="res-icon">⚙️</span>
+      <span id="eisen">0</span>
+    </div>
+    <div class="res-separator"></div>
+    <div class="res-item">
+      <span class="res-icon">⛽</span>
+      <span id="treibstoff">0</span>
+    </div>
+    <div class="res-separator"></div>
+    <div class="res-item">
+      <span class="res-icon">⚡</span>
+      <span id="stromFrei">0</span>
+    </div>
+  </div>
+
+  <!-- Main Game Layout: Nav | Content | Sidebar -->
+  <div class="game-layout">
+
+    <!-- Left Navigation Sidebar -->
+    <nav class="game-nav">
+      <div class="nav-group">
+        <a href="dashboard.html" class="nav-link">Übersicht</a>
+        <a href="bauzentrum.html" class="nav-link active">Bauzentrum</a>
+        <a href="#" class="nav-link">Union</a>
+        <a href="#" class="nav-link">Militär</a>
+        <a href="#" class="nav-link nav-italic">Geheimdienst</a>
+        <a href="#" class="nav-link nav-italic">Forschung</a>
+        <a href="#" class="nav-link nav-italic">Handelszentrum</a>
+        <a href="#" class="nav-link nav-italic">Bank</a>
+        <a href="#" class="nav-link nav-italic">Wetterstation</a>
+        <a href="#" class="nav-link nav-italic">Recyclinghof</a>
+        <a href="#" class="nav-link nav-italic">Pipeline</a>
+      </div>
+      <div class="nav-group">
+        <a href="#" class="nav-link">Highscore</a>
+        <a href="#" class="nav-link">Suche</a>
+        <a href="#" class="nav-link">✉ Nachrichten</a>
+        <a href="#" class="nav-link">Profil</a>
+        <a href="#" class="nav-link" id="logoutBtn">Logout</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Chat</span>
+        <a href="#" class="nav-link">Forum</a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="game-main">
+
+      <!-- Current Buildings -->
+      <div class="game-panel">
+        <div class="game-panel-header">Meine Gebäude</div>
+        <div class="game-panel-body" id="meineGebaeudeListe">
+          <p class="empty-state">- Noch keine Gebäude gebaut! -</p>
+        </div>
+      </div>
+
+      <!-- Build New Buildings -->
+      <div class="game-panel">
+        <div class="game-panel-header">Gebäude bauen</div>
+        <div class="game-panel-body" id="buildingTypes">
+          <p class="empty-state">Lade Gebäudetypen …</p>
+        </div>
+      </div>
+
+      <div class="message" id="message"></div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="game-sidebar">
+      <div class="sidebar-box premium-box">
+        <div class="premium-title">⭐ Premium</div>
+        <p class="premium-desc">Werde Premium-Mitglied und erhalte zusätzliche Vorteile!</p>
+        <button class="btn-premium">Mehr Infos</button>
+      </div>
+      <div class="sidebar-box buddy-box">
+        <div class="buddy-title">Buddyliste <span class="buddy-icon">↑</span></div>
+        <p class="empty-state-sm">Keine Spieler in der Buddyliste.</p>
+        <button class="btn-buddy">Spieler hinzufügen</button>
+      </div>
+    </aside>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

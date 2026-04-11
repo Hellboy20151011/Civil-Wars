@@ -7,6 +7,11 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
+function setEl(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
 async function postData(url, data) {
   const response = await fetch(url, {
     method: "POST",
@@ -63,45 +68,60 @@ function renderGebaeudeListe(gebaeude) {
   if (!container) return;
 
   if (!gebaeude || gebaeude.length === 0) {
-    container.innerHTML = "<p>Noch keine Gebäude vorhanden.</p>";
+    container.innerHTML = '<span class="empty-state">- Noch keine Gebäude gebaut! -</span>';
     return;
   }
 
   container.innerHTML = gebaeude
     .map(
       (g) => `
-        <div class="building-item">
-          <strong>${escapeHtml(g.name)}</strong> (${escapeHtml(g.kategorie)})<br>
-          Anzahl: ${escapeHtml(g.anzahl)}<br>
-          Strom: +${escapeHtml(g.strom_produktion)} / -${escapeHtml(g.strom_verbrauch)}
+        <div class="gebaeude-item">
+          <span class="gebaeude-name">${escapeHtml(g.name)}</span>
+          <span class="gebaeude-info">(${escapeHtml(g.kategorie)}) &times; ${escapeHtml(String(g.anzahl))}</span>
+          <span class="gebaeude-strom">⚡ +${escapeHtml(String(g.strom_produktion))} / -${escapeHtml(String(g.strom_verbrauch))}</span>
         </div>
       `
     )
     .join("");
 }
 
+function startClock() {
+  const clockEl = document.getElementById("headerTime");
+  if (!clockEl) return;
+
+  function tick() {
+    const now = new Date();
+    clockEl.textContent = now.toLocaleTimeString("de-DE");
+  }
+
+  tick();
+  setInterval(tick, 1000);
+}
+
 function renderStatus(data) {
-  document.getElementById("spielerName").textContent = data.name;
-  document.getElementById("spielerEmail").textContent = data.email;
+  setEl("spielerName", data.name);
+  setEl("spielerEmail", data.email);
 
-  document.getElementById("geld").textContent = data.ressourcen.geld;
-  document.getElementById("stein").textContent = data.ressourcen.stein;
-  document.getElementById("eisen").textContent = data.ressourcen.eisen;
-  document.getElementById("treibstoff").textContent = data.ressourcen.treibstoff;
+  setEl("geld", Number(data.ressourcen.geld).toLocaleString("de-DE") + " €");
+  setEl("stein", Number(data.ressourcen.stein).toLocaleString("de-DE"));
+  setEl("eisen", Number(data.ressourcen.eisen).toLocaleString("de-DE"));
+  setEl("treibstoff", Number(data.ressourcen.treibstoff).toLocaleString("de-DE"));
 
-  document.getElementById("stromProduktion").textContent = data.strom.produktion;
-  document.getElementById("stromVerbrauch").textContent = data.strom.verbrauch;
-  document.getElementById("stromFrei").textContent = data.strom.frei;
+  setEl("stromProduktion", data.strom.produktion);
+  setEl("stromVerbrauch", data.strom.verbrauch);
+  setEl("stromFrei", data.strom.frei);
 
-  document.getElementById("prodGeld").textContent = data.produktion.geld;
-  document.getElementById("prodStein").textContent = data.produktion.stein;
-  document.getElementById("prodEisen").textContent = data.produktion.eisen;
-  document.getElementById("prodTreibstoff").textContent = data.produktion.treibstoff;
+  setEl("einBauzentrale", Number(data.produktion.geld).toLocaleString("de-DE") + " €");
+  setEl("gesamtGeld", Number(data.produktion.geld).toLocaleString("de-DE") + " €");
+  setEl("prodGeld", Number(data.produktion.geld).toLocaleString("de-DE") + " €");
+  setEl("prodStein", Number(data.produktion.stein).toLocaleString("de-DE") + " t");
+  setEl("prodEisen", Number(data.produktion.eisen).toLocaleString("de-DE") + " t");
+  setEl("prodTreibstoff", Number(data.produktion.treibstoff).toLocaleString("de-DE") + " Barrel");
 
-  document.getElementById("tickDauer").textContent = data.tickDauerSekunden;
-  document.getElementById("ticksVerrechnet").textContent = data.ticksVerrechnet;
-  document.getElementById("letzteAktualisierung").textContent =
-    new Date(data.letzteAktualisierung).toLocaleString("de-DE");
+  setEl("tickDauer", data.tickDauerSekunden);
+  setEl("ticksVerrechnet", data.ticksVerrechnet);
+  setEl("letzteAktualisierung",
+    new Date(data.letzteAktualisierung).toLocaleString("de-DE"));
 
   renderGebaeudeListe(data.gebaeude);
 }
@@ -119,6 +139,7 @@ async function loadDashboard() {
 
   const data = await response.json();
   renderStatus(data);
+  startClock();
 
   await loadBuildingTypes();
 }
@@ -130,7 +151,7 @@ async function loadBuildingTypes() {
   const response = await fetch("/api/buildings/types");
 
   if (!response.ok) {
-    container.innerHTML = "<p>Gebäudetypen konnten nicht geladen werden.</p>";
+    container.innerHTML = '<p class="empty-state">Gebäudetypen konnten nicht geladen werden.</p>';
     return;
   }
 
@@ -142,17 +163,17 @@ async function loadBuildingTypes() {
         <div class="building-item">
           <strong>${escapeHtml(building.name)}</strong> (${escapeHtml(building.kategorie)})<br>
           Kosten:
-          Geld ${escapeHtml(building.kosten_geld)},
-          Stein ${escapeHtml(building.kosten_stein)},
-          Eisen ${escapeHtml(building.kosten_eisen)},
-          Treibstoff ${escapeHtml(building.kosten_treibstoff)}<br>
+          Geld ${escapeHtml(String(building.kosten_geld))},
+          Stein ${escapeHtml(String(building.kosten_stein))},
+          Eisen ${escapeHtml(String(building.kosten_eisen))},
+          Treibstoff ${escapeHtml(String(building.kosten_treibstoff))}<br>
           Produktion:
-          Geld ${escapeHtml(building.einkommen_geld)},
-          Stein ${escapeHtml(building.produktion_stein)},
-          Eisen ${escapeHtml(building.produktion_eisen)},
-          Treibstoff ${escapeHtml(building.produktion_treibstoff)}<br>
+          Geld ${escapeHtml(String(building.einkommen_geld))},
+          Stein ${escapeHtml(String(building.produktion_stein))},
+          Eisen ${escapeHtml(String(building.produktion_eisen))},
+          Treibstoff ${escapeHtml(String(building.produktion_treibstoff))}<br>
           Strom:
-          +${escapeHtml(building.strom_produktion)} / -${escapeHtml(building.strom_verbrauch)}<br><br>
+          +${escapeHtml(String(building.strom_produktion))} / -${escapeHtml(String(building.strom_verbrauch))}<br><br>
           <button onclick="buildBuilding(${parseInt(building.id, 10)})">Bauen</button>
         </div>
       `
@@ -164,10 +185,11 @@ async function buildBuilding(gebaeudeTypId) {
   const message = document.getElementById("message");
 
   const result = await postData("/api/buildings/build", { gebaeudeTypId });
-  message.textContent = result.message;
+  if (message) message.textContent = result.message;
 
   if (result.status) {
     renderStatus(result.status);
+    await loadBuildingTypes();
   }
 }
 

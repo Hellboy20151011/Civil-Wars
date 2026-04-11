@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS gebaeude_typen (
     produktion_eisen BIGINT NOT NULL DEFAULT 0,
     produktion_treibstoff BIGINT NOT NULL DEFAULT 0,
     strom_produktion BIGINT NOT NULL DEFAULT 0,
-    strom_verbrauch BIGINT NOT NULL DEFAULT 0
+    strom_verbrauch BIGINT NOT NULL DEFAULT 0,
+    bewohner BIGINT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS spieler_gebaeude (
@@ -48,17 +49,17 @@ CREATE TABLE IF NOT EXISTS user_sessions (
 
 CREATE INDEX IF NOT EXISTS user_sessions_expire_idx ON user_sessions (expire);
 
-INSERT INTO gebaeude_typen (name, kategorie, kosten_geld, kosten_stein, kosten_eisen, kosten_treibstoff, einkommen_geld, produktion_stein, produktion_eisen, produktion_treibstoff, strom_produktion, strom_verbrauch)
+INSERT INTO gebaeude_typen (name, kategorie, kosten_geld, kosten_stein, kosten_eisen, kosten_treibstoff, einkommen_geld, produktion_stein, produktion_eisen, produktion_treibstoff, strom_produktion, strom_verbrauch, bewohner)
 VALUES
-    ('Hauptgebäude',   'Basis',       0,      0,   0,  0,  0,    0,  0,  0, 10, 0),
-    ('Kraftwerk',      'Versorgung',  5000,   50,  20, 0,  0,    0,  0,  0, 20, 2),
-    ('Mine',           'Produktion',  3000,   30,  10, 0,  0,    5,  0,  0, 0,  3),
-    ('Eisenhütte',     'Produktion',  4000,   40,  15, 0,  0,    0,  5,  0, 0,  4),
-    ('Raffinerie',     'Produktion',  6000,   60,  25, 10, 0,    0,  0,  3, 0,  5),
-    ('Marktplatz',     'Wirtschaft',  8000,   80,  30, 5,  500,  0,  0,  0, 0,  3),
-    ('Kaserne',        'Militär',     10000,  100, 50, 20, 0,    0,  0,  0, 0,  6),
-    ('Wohnhaus',       'Unterkunft',  100000, 50,  10, 0,  5000, 0,  0,  0, 0,  1),
-    ('Reihenhaus',     'Unterkunft',  170000, 100, 10, 0,  9000, 0,  0,  0, 0,  2),
-    ('Mehrfamilienhaus','Unterkunft', 230000, 150, 15, 0,  12500,0,  0,  0, 0,  3),
-    ('Hochhaus',       'Unterkunft',  320000, 200, 20, 0,  17500,0,  0,  0, 0,  4)
-ON CONFLICT (name) DO NOTHING;
+    ('Hauptgebäude',   'Basis',       0,      0,   0,  0,  0,    0,  0,  0, 10, 0, 0),
+    ('Kraftwerk',      'Versorgung',  5000,   50,  20, 0,  0,    0,  0,  0, 20, 2, 0),
+    ('Mine',           'Produktion',  3000,   30,  10, 0,  0,    5,  0,  0, 0,  3, 0),
+    ('Eisenhütte',     'Produktion',  4000,   40,  15, 0,  0,    0,  5,  0, 0,  4, 0),
+    ('Raffinerie',     'Produktion',  6000,   60,  25, 10, 0,    0,  0,  3, 0,  5, 0),
+    ('Marktplatz',     'Wirtschaft',  8000,   80,  30, 5,  500,  0,  0,  0, 0,  3, 0),
+    ('Kaserne',        'Militär',     10000,  100, 50, 20, 0,    0,  0,  0, 0,  6, 0),
+    ('Wohnhaus',       'Unterkunft',  100000, 50,  10, 0,  5000, 0,  0,  0, 0,  1, 4),
+    ('Reihenhaus',     'Unterkunft',  170000, 100, 10, 0,  9000, 0,  0,  0, 0,  2, 12),
+    ('Mehrfamilienhaus','Unterkunft', 230000, 150, 15, 0,  12500,0,  0,  0, 0,  3, 25),
+    ('Hochhaus',       'Unterkunft',  320000, 200, 20, 0,  17500,0,  0,  0, 0,  4, 50)
+ON CONFLICT (name) DO UPDATE SET bewohner = EXCLUDED.bewohner;

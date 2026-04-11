@@ -48,6 +48,11 @@
       <span class="res-icon">⚡</span>
       <span id="stromFrei">0</span>
     </div>
+    <div class="res-separator"></div>
+    <div class="res-item">
+      <span class="res-icon">👥</span>
+      <span id="bewohner">0</span>
+    </div>
   </div>
 
   <!-- Main Game Layout: Nav | Content | Sidebar -->
@@ -111,6 +116,27 @@
 
     <!-- Right Sidebar -->
     <aside class="game-sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-income-title">Einnahmen / Tick</div>
+        <table class="data-table">
+          <tr>
+            <td>Mieteinnahmen</td>
+            <td class="num-pos" id="einMieteinnahmen">0 €</td>
+          </tr>
+          <tr>
+            <td>Steuern</td>
+            <td class="num-pos" id="einSteuern">0 €</td>
+          </tr>
+          <tr>
+            <td>Sonstige</td>
+            <td class="num-pos" id="einBauzentrale">0 €</td>
+          </tr>
+          <tr class="total-row">
+            <td><strong>Gesamt</strong></td>
+            <td class="num-pos"><strong id="gesamtGeld">0 €</strong></td>
+          </tr>
+        </table>
+      </div>
       <div class="sidebar-box premium-box">
         <div class="premium-title">⭐ Premium</div>
         <p class="premium-desc">Werde Premium-Mitglied und erhalte zusätzliche Vorteile!</p>

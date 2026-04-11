@@ -38,7 +38,8 @@ async function findBySpieler(spielerId, client = pool) {
         gt.produktion_eisen,
         gt.produktion_treibstoff,
         gt.strom_produktion,
-        gt.strom_verbrauch
+        gt.strom_verbrauch,
+        gt.bewohner
      FROM spieler_gebaeude sg
      JOIN gebaeude_typen gt ON gt.id = sg.gebaeude_typ_id
      WHERE sg.spieler_id = $1

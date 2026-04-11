@@ -47,6 +47,9 @@ function startClock() {
 function renderStatus(data) {
   setEl("spielerName", data.name);
   setEl("spielerEmail", data.email);
+  const kx = data.koordinate_x != null ? data.koordinate_x : "-";
+  const ky = data.koordinate_y != null ? data.koordinate_y : "-";
+  setEl("spielerKoord", kx + ":" + ky);
 
   setEl("geld", Number(data.ressourcen.geld).toLocaleString("de-DE") + " €");
   setEl("stein", Number(data.ressourcen.stein).toLocaleString("de-DE"));

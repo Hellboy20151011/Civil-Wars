@@ -3,10 +3,19 @@ const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 const bcrypt = require("bcrypt");
 const path = require("path");
+const rateLimit = require("express-rate-limit");
 const pool = require("./db");
 
 const app = express();
 const PORT = 3000;
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Zu viele Anfragen. Bitte versuche es später erneut." }
+});
 
 /* Zum Testen 30 Sekunden
    Später für Live-Betrieb auf 600 setzen */
@@ -21,11 +30,13 @@ app.use(
       pool: pool,
       tableName: "user_sessions"
     }),
-    secret: "civil-wars-super-secret",
+    secret: process.env.SESSION_SECRET || "civil-wars-super-secret",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+      sameSite: "strict"
     }
   })
 );
@@ -212,7 +223,7 @@ async function getSpielerStatus(spielerId, client = pool) {
 }
 
 /* Registrierung */
-app.post("/api/register", async (req, res) => {
+app.post("/api/register", authLimiter, async (req, res) => {
   const client = await pool.connect();
 
   try {
@@ -222,16 +233,17 @@ app.post("/api/register", async (req, res) => {
       return res.status(400).json({ message: "Bitte alle Felder ausfüllen" });
     }
 
+    await client.query("BEGIN");
+
     const userCheck = await client.query(
       "SELECT id FROM spieler WHERE name = $1 OR email = $2",
       [name, email]
     );
 
     if (userCheck.rows.length > 0) {
+      await client.query("ROLLBACK");
       return res.status(400).json({ message: "Name oder E-Mail bereits vergeben" });
     }
-
-    await client.query("BEGIN");
 
     const hash = await bcrypt.hash(passwort, 10);
 
@@ -276,6 +288,9 @@ app.post("/api/register", async (req, res) => {
     });
   } catch (error) {
     await client.query("ROLLBACK");
+    if (error.code === "23505") {
+      return res.status(400).json({ message: "Name oder E-Mail bereits vergeben" });
+    }
     console.error("Registrierungsfehler:", error);
     res.status(500).json({ message: "Serverfehler bei Registrierung" });
   } finally {
@@ -284,7 +299,7 @@ app.post("/api/register", async (req, res) => {
 });
 
 /* Login */
-app.post("/api/login", async (req, res) => {
+app.post("/api/login", authLimiter, async (req, res) => {
   try {
     const { email, passwort } = req.body;
 
@@ -366,9 +381,9 @@ app.post("/api/buildings/build", requireLogin, async (req, res) => {
 
   try {
     const spielerId = req.session.spieler.id;
-    const { gebaeudeTypId } = req.body;
+    const gebaeudeTypId = parseInt(req.body.gebaeudeTypId, 10);
 
-    if (!gebaeudeTypId) {
+    if (!gebaeudeTypId || isNaN(gebaeudeTypId)) {
       return res.status(400).json({ message: "Gebäudetyp fehlt" });
     }
 

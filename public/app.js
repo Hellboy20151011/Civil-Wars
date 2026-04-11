@@ -155,31 +155,95 @@ async function loadBuildingTypes() {
     return;
   }
 
-  const buildingTypes = await response.json();
+  const allBuildingTypes = await response.json();
 
-  container.innerHTML = buildingTypes
-    .map(
-      (building) => `
-        <div class="building-item">
-          <strong>${escapeHtml(building.name)}</strong> (${escapeHtml(building.kategorie)})<br>
-          Kosten:
-          Geld ${escapeHtml(String(building.kosten_geld))},
-          Stein ${escapeHtml(String(building.kosten_stein))},
-          Eisen ${escapeHtml(String(building.kosten_eisen))},
-          Treibstoff ${escapeHtml(String(building.kosten_treibstoff))}<br>
-          Produktion:
-          Geld ${escapeHtml(String(building.einkommen_geld))},
-          Stein ${escapeHtml(String(building.produktion_stein))},
-          Eisen ${escapeHtml(String(building.produktion_eisen))},
-          Treibstoff ${escapeHtml(String(building.produktion_treibstoff))}<br>
-          Strom:
-          +${escapeHtml(String(building.strom_produktion))} / -${escapeHtml(String(building.strom_verbrauch))}<br><br>
-          <button onclick="buildBuilding(${parseInt(building.id, 10)})">Bauen</button>
+  /* Spieler-Ressourcen und Gebäude für Zähler */
+  let spielerGebaeude = [];
+  let ressourcen = null;
+  let stromFrei = 0;
+  const statusRes = await fetch("/api/me");
+  if (statusRes.ok) {
+    const statusData = await statusRes.json();
+    spielerGebaeude = statusData.gebaeude || [];
+    ressourcen = statusData.ressourcen || null;
+    stromFrei = statusData.strom ? Number(statusData.strom.frei) : 0;
+  }
+
+  /* Aktive Kategorie ermitteln */
+  const activeTab = document.querySelector(".bau-tab.active");
+  const aktiveKategorie = activeTab ? activeTab.dataset.kategorie : "Unterkunft";
+
+  const buildingDescriptions = {
+    'Wohnhaus':         'Das Wohnhaus bietet Platz für 4 Bewohner.\nFür jedes Wohnhaus erhältst du eine Grundmiete von 5.000 €.',
+    'Reihenhaus':       'Das Reihenhaus bietet Platz für 12 Bewohner.\nFür jedes Reihenhaus erhältst du eine Grundmiete von 9.000 €.',
+    'Mehrfamilienhaus': 'Das Mehrfamilienhaus bietet Platz für 25 Bewohner.\nFür jedes Mehrfamilienhaus erhältst du eine Grundmiete von 12.500 €.',
+    'Hochhaus':         'Das Hochhaus bietet Platz für 50 Bewohner.\nFür jedes Hochhaus erhältst du eine Grundmiete von 17.500 €.',
+  };
+
+  const filtered = allBuildingTypes.filter(b => b.kategorie === aktiveKategorie);
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="empty-state">Keine Gebäude in dieser Kategorie.</p>';
+    return;
+  }
+
+  container.innerHTML = filtered
+    .map((building) => {
+      const gebaut = spielerGebaeude.find(g => Number(g.id) === Number(building.id));
+      const anzahlGebaut = gebaut ? Number(gebaut.anzahl) : 0;
+
+      /* Berechne wie viele Gebäude gerade baubar sind */
+      let derzeit = 0;
+      if (ressourcen) {
+        const maxGeld  = Number(building.kosten_geld)  > 0 ? Math.floor(Number(ressourcen.geld)  / Number(building.kosten_geld))  : Infinity;
+        const maxStein = Number(building.kosten_stein) > 0 ? Math.floor(Number(ressourcen.stein) / Number(building.kosten_stein)) : Infinity;
+        const maxEisen = Number(building.kosten_eisen) > 0 ? Math.floor(Number(ressourcen.eisen) / Number(building.kosten_eisen)) : Infinity;
+        const maxStrom = Number(building.strom_verbrauch) > 0 ? Math.floor(stromFrei / Number(building.strom_verbrauch)) : Infinity;
+        const finite = [maxGeld, maxStein, maxEisen, maxStrom].filter(v => v !== Infinity);
+        derzeit = finite.length > 0 ? Math.max(0, Math.min(...finite)) : 0;
+      }
+      const desc = buildingDescriptions[building.name] || '';
+      const descLines = desc.split('\n').map(l => `<p class="bau-desc-line">${escapeHtml(l)}</p>`).join('');
+      return `
+        <div class="bau-card">
+          <div class="bau-card-header">${escapeHtml(building.name)}</div>
+          <div class="bau-card-body">
+            <div class="bau-card-left">
+              <div class="bau-card-section-title"><u>Beschreibung</u></div>
+              <div class="bau-card-desc">${descLines}</div>
+              <div class="bau-card-bauzeit">Bauzeit &nbsp;&nbsp; --:--:-- h</div>
+            </div>
+            <div class="bau-card-right">
+              <div class="bau-card-section-title"><u>Kosten:</u></div>
+              <table class="bau-cost-table">
+                <tr><td>Geld</td><td>${Number(building.kosten_geld).toLocaleString("de-DE")} €</td></tr>
+                <tr><td>Stein</td><td>${Number(building.kosten_stein).toLocaleString("de-DE")} t</td></tr>
+                <tr><td>Eisen</td><td>${Number(building.kosten_eisen).toLocaleString("de-DE")} t</td></tr>
+                <tr><td>Strom</td><td>${Number(building.strom_verbrauch).toLocaleString("de-DE")} MW</td></tr>
+              </table>
+              <table class="bau-cost-table bau-cost-table-sm">
+                <tr><td>Bereits gebaut</td><td>${escapeHtml(String(anzahlGebaut))} Stück</td></tr>
+                <tr><td>Derzeit baubar</td><td>${escapeHtml(String(derzeit))} Stück</td></tr>
+              </table>
+            </div>
+            <div class="bau-card-img">
+              <div class="bau-img-placeholder"></div>
+              <button class="bau-btn-bauen" onclick="buildBuilding(${parseInt(building.id, 10)})">Bauen</button>
+            </div>
+          </div>
         </div>
-      `
-    )
+      `;
+    })
     .join("");
 }
+
+/* Tab-Switching für Bauzentrum */
+document.addEventListener("click", async (e) => {
+  if (!e.target.classList.contains("bau-tab")) return;
+  document.querySelectorAll(".bau-tab").forEach(t => t.classList.remove("active"));
+  e.target.classList.add("active");
+  await loadBuildingTypes();
+});
 
 async function buildBuilding(gebaeudeTypId) {
   const message = document.getElementById("message");

@@ -56,5 +56,9 @@ VALUES
     ('Eisenhütte',     'Produktion',  4000,   40,  15, 0,  0,    0,  5,  0, 0,  4),
     ('Raffinerie',     'Produktion',  6000,   60,  25, 10, 0,    0,  0,  3, 0,  5),
     ('Marktplatz',     'Wirtschaft',  8000,   80,  30, 5,  500,  0,  0,  0, 0,  3),
-    ('Kaserne',        'Militär',     10000,  100, 50, 20, 0,    0,  0,  0, 0,  6)
+    ('Kaserne',        'Militär',     10000,  100, 50, 20, 0,    0,  0,  0, 0,  6),
+    ('Wohnhaus',       'Unterkunft',  100000, 50,  10, 0,  5000, 0,  0,  0, 0,  1),
+    ('Reihenhaus',     'Unterkunft',  170000, 100, 10, 0,  9000, 0,  0,  0, 0,  2),
+    ('Mehrfamilienhaus','Unterkunft', 230000, 150, 15, 0,  12500,0,  0,  0, 0,  3),
+    ('Hochhaus',       'Unterkunft',  320000, 200, 20, 0,  17500,0,  0,  0, 0,  4)
 ON CONFLICT (name) DO NOTHING;

@@ -288,6 +288,9 @@ app.post("/api/register", authLimiter, async (req, res) => {
     });
   } catch (error) {
     await client.query("ROLLBACK");
+    if (error.code === "23505") {
+      return res.status(400).json({ message: "Name oder E-Mail bereits vergeben" });
+    }
     console.error("Registrierungsfehler:", error);
     res.status(500).json({ message: "Serverfehler bei Registrierung" });
   } finally {

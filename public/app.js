@@ -153,7 +153,7 @@ async function loadBuildingTypes() {
           Treibstoff ${escapeHtml(building.produktion_treibstoff)}<br>
           Strom:
           +${escapeHtml(building.strom_produktion)} / -${escapeHtml(building.strom_verbrauch)}<br><br>
-          <button onclick="buildBuilding(${escapeHtml(String(parseInt(building.id, 10)))})">Bauen</button>
+          <button onclick="buildBuilding(${parseInt(building.id, 10)})">Bauen</button>
         </div>
       `
     )

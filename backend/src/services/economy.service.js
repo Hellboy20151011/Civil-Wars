@@ -9,7 +9,10 @@ async function getGebaeudeStatus(spielerId, client) {
 
   let stromProduktion = 0;
   let stromVerbrauch = 0;
-  let produktionGeld = 0;
+  let mieteinnahmen = 0;
+  let steuerBasisBewohner = 0;
+  let einnahmenSonstige = 0;
+  let gesamtBewohner = 0;
   let produktionStein = 0;
   let produktionEisen = 0;
   let produktionTreibstoff = 0;
@@ -18,18 +21,35 @@ async function getGebaeudeStatus(spielerId, client) {
     const anzahl = Number(geb.anzahl);
     stromProduktion += Number(geb.strom_produktion) * anzahl;
     stromVerbrauch += Number(geb.strom_verbrauch) * anzahl;
-    produktionGeld += Number(geb.einkommen_geld) * anzahl;
     produktionStein += Number(geb.produktion_stein) * anzahl;
     produktionEisen += Number(geb.produktion_eisen) * anzahl;
     produktionTreibstoff += Number(geb.produktion_treibstoff) * anzahl;
+
+    if (geb.kategorie === 'Unterkunft') {
+      mieteinnahmen += Number(geb.einkommen_geld) * anzahl;
+      gesamtBewohner += Number(geb.bewohner) * anzahl;
+    } else {
+      einnahmenSonstige += Number(geb.einkommen_geld) * anzahl;
+    }
   }
+
+  /* Jeder Bewohner zahlt 1 € Steuern pro Tick */
+  steuerBasisBewohner = gesamtBewohner;
+  const produktionGeld = mieteinnahmen + steuerBasisBewohner + einnahmenSonstige;
 
   return {
     gebaeude,
+    bewohner: gesamtBewohner,
     strom: {
       produktion: stromProduktion,
       verbrauch: stromVerbrauch,
       frei: stromProduktion - stromVerbrauch,
+    },
+    einnahmen: {
+      gesamt: produktionGeld,
+      miete: mieteinnahmen,
+      steuern: steuerBasisBewohner,
+      sonstige: einnahmenSonstige,
     },
     produktion: {
       geld: produktionGeld,
@@ -63,7 +83,9 @@ async function applyProductionTicks(spielerId, client) {
         eisen: Number(ressourcen.eisen),
         treibstoff: Number(ressourcen.treibstoff),
       },
+      bewohner: gebaeudeStatus.bewohner,
       strom: gebaeudeStatus.strom,
+      einnahmen: gebaeudeStatus.einnahmen,
       produktion: gebaeudeStatus.produktion,
       gebaeude: gebaeudeStatus.gebaeude,
       letzteAktualisierung,
@@ -97,7 +119,9 @@ async function applyProductionTicks(spielerId, client) {
       eisen: Number(neueRessourcen.eisen),
       treibstoff: Number(neueRessourcen.treibstoff),
     },
+    bewohner: gebaeudeStatus.bewohner,
     strom: gebaeudeStatus.strom,
+    einnahmen: gebaeudeStatus.einnahmen,
     produktion: gebaeudeStatus.produktion,
     gebaeude: gebaeudeStatus.gebaeude,
     letzteAktualisierung: neueRessourcen.letzte_aktualisierung,

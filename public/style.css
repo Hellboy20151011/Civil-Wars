@@ -700,3 +700,9 @@ a {
   border-radius: 10px;
   margin-bottom: 15px;
 }
+.sidebar-income-title {
+  font-weight: bold;
+  font-size: 13px;
+  color: #a0c8a0;
+  margin-bottom: 8px;
+}

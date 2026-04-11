@@ -106,14 +106,23 @@ function renderStatus(data) {
   setEl("stein", Number(data.ressourcen.stein).toLocaleString("de-DE"));
   setEl("eisen", Number(data.ressourcen.eisen).toLocaleString("de-DE"));
   setEl("treibstoff", Number(data.ressourcen.treibstoff).toLocaleString("de-DE"));
+  setEl("bewohner", Number(data.bewohner || 0).toLocaleString("de-DE"));
 
   setEl("stromProduktion", data.strom.produktion);
   setEl("stromVerbrauch", data.strom.verbrauch);
   setEl("stromFrei", data.strom.frei);
 
-  setEl("einBauzentrale", Number(data.produktion.geld).toLocaleString("de-DE") + " €");
-  setEl("gesamtGeld", Number(data.produktion.geld).toLocaleString("de-DE") + " €");
-  setEl("prodGeld", Number(data.produktion.geld).toLocaleString("de-DE") + " €");
+  const einnahmen = data.einnahmen || {};
+  const gesamtEinnahmen = Number(einnahmen.gesamt ?? data.produktion.geld);
+  const mietEinnahmen   = Number(einnahmen.miete   ?? 0);
+  const steuerEinnahmen = Number(einnahmen.steuern ?? 0);
+  const sonstigeEinnahmen = Number(einnahmen.sonstige ?? data.produktion.geld);
+
+  setEl("einBauzentrale", sonstigeEinnahmen.toLocaleString("de-DE") + " €");
+  setEl("einMieteinnahmen", mietEinnahmen.toLocaleString("de-DE") + " €");
+  setEl("einSteuern", steuerEinnahmen.toLocaleString("de-DE") + " €");
+  setEl("gesamtGeld", gesamtEinnahmen.toLocaleString("de-DE") + " €");
+  setEl("prodGeld", gesamtEinnahmen.toLocaleString("de-DE") + " €");
   setEl("prodStein", Number(data.produktion.stein).toLocaleString("de-DE") + " t");
   setEl("prodEisen", Number(data.produktion.eisen).toLocaleString("de-DE") + " t");
   setEl("prodTreibstoff", Number(data.produktion.treibstoff).toLocaleString("de-DE") + " Barrel");
@@ -173,13 +182,6 @@ async function loadBuildingTypes() {
   const activeTab = document.querySelector(".bau-tab.active");
   const aktiveKategorie = activeTab ? activeTab.dataset.kategorie : "Unterkunft";
 
-  const buildingDescriptions = {
-    'Wohnhaus':         'Das Wohnhaus bietet Platz für 4 Bewohner.\nFür jedes Wohnhaus erhältst du eine Grundmiete von 5.000 €.',
-    'Reihenhaus':       'Das Reihenhaus bietet Platz für 12 Bewohner.\nFür jedes Reihenhaus erhältst du eine Grundmiete von 9.000 €.',
-    'Mehrfamilienhaus': 'Das Mehrfamilienhaus bietet Platz für 25 Bewohner.\nFür jedes Mehrfamilienhaus erhältst du eine Grundmiete von 12.500 €.',
-    'Hochhaus':         'Das Hochhaus bietet Platz für 50 Bewohner.\nFür jedes Hochhaus erhältst du eine Grundmiete von 17.500 €.',
-  };
-
   const filtered = allBuildingTypes.filter(b => b.kategorie === aktiveKategorie);
 
   if (filtered.length === 0) {
@@ -202,8 +204,19 @@ async function loadBuildingTypes() {
         const finite = [maxGeld, maxStein, maxEisen, maxStrom].filter(v => v !== Infinity);
         derzeit = finite.length > 0 ? Math.max(0, Math.min(...finite)) : 0;
       }
-      const desc = buildingDescriptions[building.name] || '';
-      const descLines = desc.split('\n').map(l => `<p class="bau-desc-line">${escapeHtml(l)}</p>`).join('');
+
+      /* Beschreibung dynamisch aus Datenbankfeldern erzeugen */
+      const bewohner = Number(building.bewohner || 0);
+      const miete = Number(building.einkommen_geld || 0);
+      let descLines = '';
+      if (bewohner > 0) {
+        descLines += `<p class="bau-desc-line">Bietet Platz für ${bewohner.toLocaleString("de-DE")} Bewohner.</p>`;
+        descLines += `<p class="bau-desc-line">Mieteinnahmen: ${miete.toLocaleString("de-DE")} € / Tick</p>`;
+        descLines += `<p class="bau-desc-line">Steuereinnahmen: ${bewohner.toLocaleString("de-DE")} € / Tick</p>`;
+      } else if (miete > 0) {
+        descLines += `<p class="bau-desc-line">Einnahmen: ${miete.toLocaleString("de-DE")} € / Tick</p>`;
+      }
+
       return `
         <div class="bau-card">
           <div class="bau-card-header">${escapeHtml(building.name)}</div>

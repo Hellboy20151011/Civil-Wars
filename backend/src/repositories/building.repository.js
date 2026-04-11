@@ -29,6 +29,7 @@ async function findBySpieler(spielerId, client = pool) {
         gt.name,
         gt.kategorie,
         sg.anzahl,
+        sg.stufe,
         gt.kosten_geld,
         gt.kosten_stein,
         gt.kosten_eisen,
@@ -60,6 +61,29 @@ async function findSpielerGebaeudeAnzahlByName(spielerId, name, client = pool) {
   return result.rows[0] ? Number(result.rows[0].anzahl) : 0;
 }
 
+async function findKaserneStufe(spielerId, client = pool) {
+  const result = await client.query(
+    `SELECT sg.stufe
+     FROM spieler_gebaeude sg
+     JOIN gebaeude_typen gt ON gt.id = sg.gebaeude_typ_id
+     WHERE sg.spieler_id = $1 AND gt.name = 'Kaserne'`,
+    [spielerId]
+  );
+  return result.rows[0] ? Number(result.rows[0].stufe) : 0;
+}
+
+async function upgradeKaserneStufe(spielerId, client = pool) {
+  await client.query(
+    `UPDATE spieler_gebaeude sg
+     SET stufe = sg.stufe + 1
+     FROM gebaeude_typen gt
+     WHERE sg.gebaeude_typ_id = gt.id
+       AND sg.spieler_id = $1
+       AND gt.name = 'Kaserne'`,
+    [spielerId]
+  );
+}
+
 async function upsertSpielerGebaeude(spielerId, gebaeudeTypId, anzahl = 1, client = pool) {
   await client.query(
     `INSERT INTO spieler_gebaeude (spieler_id, gebaeude_typ_id, anzahl)
@@ -70,11 +94,28 @@ async function upsertSpielerGebaeude(spielerId, gebaeudeTypId, anzahl = 1, clien
   );
 }
 
+async function findKaserneStufen(client = pool) {
+  const result = await client.query('SELECT * FROM kaserne_stufen ORDER BY stufe');
+  return result.rows;
+}
+
+async function findKaserneStufenById(stufe, client = pool) {
+  const result = await client.query(
+    'SELECT * FROM kaserne_stufen WHERE stufe = $1',
+    [stufe]
+  );
+  return result.rows[0] || null;
+}
+
 module.exports = {
   findAllTypes,
   findTypById,
   findHauptgebaeude,
   findBySpieler,
   findSpielerGebaeudeAnzahlByName,
+  findKaserneStufe,
+  upgradeKaserneStufe,
   upsertSpielerGebaeude,
+  findKaserneStufen,
+  findKaserneStufenById,
 };

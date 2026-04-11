@@ -33,6 +33,14 @@ async function build(req, res) {
       return res.status(400).json({ message: 'Hauptgebäude kann nicht gebaut werden' });
     }
 
+    if (gebaeude.name === 'Kaserne') {
+      const kaserneAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Kaserne', client);
+      if (kaserneAnzahl >= 1) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ message: 'Die Kaserne ist bereits gebaut. Upgrade im Militär-Menü möglich.' });
+      }
+    }
+
     if (gebaeude.name === 'Öl-Raffinerie') {
       const bohrturmAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Bohrturm', client);
       const raffinerieAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Öl-Raffinerie', client);

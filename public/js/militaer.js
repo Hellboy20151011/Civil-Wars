@@ -1,0 +1,190 @@
+/**
+ * militaer.js – Militärseite: Kaserne-Status, Upgrade, Einheiten ausbilden
+ * Benötigt: utils.js (escapeHtml, setEl, postData), dashboard.js (renderStatus, loadDashboard)
+ */
+
+const MAX_KASERNE_STUFE = 4;
+
+/* ── Militärstatus laden ───────────────────────────────────── */
+
+async function loadMilitaerStatus() {
+  const kaserneStatus  = document.getElementById('kaserneStatus');
+  const einheitenListe = document.getElementById('einheitenListe');
+  if (!kaserneStatus) return;
+
+  const response = await fetch('/api/military/status');
+  if (!response.ok) {
+    kaserneStatus.innerHTML = '<p class="empty-state">Militärstatus konnte nicht geladen werden.</p>';
+    return;
+  }
+
+  const data = await response.json();
+  renderKaserneStatus(data, kaserneStatus);
+  if (einheitenListe) {
+    renderEinheitenListe(data, einheitenListe);
+  }
+}
+
+/* ── Kaserne-Status rendern ────────────────────────────────── */
+
+function renderKaserneStatus(data, container) {
+  const { kaserneStufe, maxStufe, nextUpgrade, ressourcen } = data;
+
+  if (kaserneStufe === 0) {
+    container.innerHTML = `
+      <p class="empty-state">
+        Du hast noch keine Kaserne gebaut.<br>
+        Baue zuerst eine Kaserne im
+        <a href="bauzentrum.html" class="nav-link" style="display:inline">Bauzentrum</a>
+        (Kategorie Militär).
+      </p>`;
+    return;
+  }
+
+  const stufenSterne = '★'.repeat(kaserneStufe) + '☆'.repeat(maxStufe - kaserneStufe);
+
+  let upgradeHtml = '';
+  if (nextUpgrade) {
+    const canAfford =
+      ressourcen.geld  >= Number(nextUpgrade.kosten_geld)  &&
+      ressourcen.stein >= Number(nextUpgrade.kosten_stein) &&
+      ressourcen.eisen >= Number(nextUpgrade.kosten_eisen);
+
+    upgradeHtml = `
+      <div class="mil-upgrade-box">
+        <div class="bau-card-section-title"><u>Upgrade auf Stufe ${nextUpgrade.stufe}</u></div>
+        <table class="bau-cost-table">
+          <tr><td>Geld</td><td>${Number(nextUpgrade.kosten_geld).toLocaleString('de-DE')} €</td></tr>
+          <tr><td>Stein</td><td>${Number(nextUpgrade.kosten_stein).toLocaleString('de-DE')} t</td></tr>
+          <tr><td>Eisen</td><td>${Number(nextUpgrade.kosten_eisen).toLocaleString('de-DE')} t</td></tr>
+          <tr><td>Bauzeit</td><td>${nextUpgrade.bauzeit_minuten} Minuten</td></tr>
+        </table>
+        <button
+          class="bau-btn-bauen"
+          id="btnUpgradeKaserne"
+          onclick="doUpgradeKaserne()"
+          ${canAfford ? '' : 'disabled'}
+        >Kaserne ausbauen</button>
+        ${canAfford ? '' : '<p class="mil-not-possible">Nicht genug Ressourcen</p>'}
+      </div>`;
+  } else {
+    upgradeHtml = '<p class="mil-max-stufe">Kaserne ist auf maximaler Stufe.</p>';
+  }
+
+  container.innerHTML = `
+    <div class="mil-kaserne-status">
+      <div class="mil-stufe-row">
+        <span class="mil-stufe-label">Aktuelle Stufe:</span>
+        <span class="mil-stufe-val">Stufe ${kaserneStufe} von ${maxStufe} &nbsp; ${stufenSterne}</span>
+      </div>
+      ${upgradeHtml}
+    </div>`;
+}
+
+/* ── Einheitenliste rendern ────────────────────────────────── */
+
+function renderEinheitenListe(data, container) {
+  const { kaserneStufe, einheiten } = data;
+
+  if (kaserneStufe === 0) {
+    container.innerHTML = '<p class="empty-state">Keine Kaserne vorhanden – Einheiten nicht verfügbar.</p>';
+    return;
+  }
+
+  if (!einheiten || einheiten.length === 0) {
+    container.innerHTML = '<p class="empty-state">Keine Einheitentypen verfügbar.</p>';
+    return;
+  }
+
+  container.innerHTML = einheiten.map((e) => {
+    const verfuegbar = kaserneStufe >= Number(e.kaserne_stufe_min);
+    const reisezeit = formatReisezeit(Number(e.reisezeit_minuten));
+
+    return `
+      <div class="mil-einheit-row ${verfuegbar ? '' : 'mil-einheit-locked'}">
+        <div class="mil-einheit-img">
+          <div class="bau-img-placeholder mil-einheit-placeholder"></div>
+        </div>
+        <div class="mil-einheit-info">
+          <div class="mil-einheit-name">${escapeHtml(e.name)}</div>
+          <div class="mil-einheit-stats">
+            <span>Angriff: <strong>${escapeHtml(String(e.angriff))}</strong></span>
+            <span>Abwehr: <strong>${escapeHtml(String(e.abwehr))}</strong></span>
+            <span>Reisezeit: <strong>${escapeHtml(reisezeit)}</strong></span>
+          </div>
+          <div class="mil-einheit-vorhanden">Vorhanden: ${Number(e.anzahl).toLocaleString('de-DE')}</div>
+          ${!verfuegbar ? `<div class="mil-not-possible">Benötigt Kaserne Stufe ${escapeHtml(String(e.kaserne_stufe_min))}</div>` : ''}
+        </div>
+        <div class="mil-einheit-kosten">
+          <div class="bau-card-section-title"><u>Kosten</u></div>
+          <table class="bau-cost-table">
+            <tr><td>Geld</td><td>${Number(e.kosten_geld).toLocaleString('de-DE')} €</td></tr>
+            <tr><td>Stein</td><td>${Number(e.kosten_stein).toLocaleString('de-DE')} t</td></tr>
+            <tr><td>Eisen</td><td>${Number(e.kosten_eisen).toLocaleString('de-DE')} t</td></tr>
+          </table>
+        </div>
+        <div class="mil-einheit-ausbilden">
+          <div class="bau-card-section-title"><u>Ausbilden</u></div>
+          ${verfuegbar
+            ? `<div class="bau-anzahl-row">
+                <input
+                  type="number"
+                  id="anzahl-einheit-${parseInt(e.id, 10)}"
+                  class="bau-anzahl-input"
+                  min="1"
+                  value="1"
+                >
+                <button class="bau-btn-bauen" onclick="doTrainEinheit(${parseInt(e.id, 10)})">Ausbilden</button>
+              </div>`
+            : `<span class="mil-not-possible">Noch nicht möglich</span>`
+          }
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ── Kaserne upgraden ──────────────────────────────────────── */
+
+async function doUpgradeKaserne() {
+  const message = document.getElementById('message');
+  const btn = document.getElementById('btnUpgradeKaserne');
+  if (btn) btn.disabled = true;
+
+  const result = await postData('/api/military/upgrade', {});
+  if (message) message.textContent = result.message;
+
+  if (result.status) {
+    renderStatus(result.status);
+  }
+
+  await loadMilitaerStatus();
+}
+
+/* ── Einheit ausbilden ─────────────────────────────────────── */
+
+async function doTrainEinheit(einheitTypId) {
+  const message = document.getElementById('message');
+  const input = document.getElementById(`anzahl-einheit-${einheitTypId}`);
+  const anzahl = input ? Math.max(1, parseInt(input.value, 10) || 1) : 1;
+
+  const result = await postData('/api/military/train', { einheitTypId, anzahl });
+  if (message) message.textContent = result.message;
+
+  if (result.status) {
+    renderStatus(result.status);
+  }
+
+  await loadMilitaerStatus();
+}
+
+/* ── Hilfsfunktion: Reisezeit formatieren ─────────────────── */
+
+function formatReisezeit(minuten) {
+  const h = Math.floor(minuten / 60);
+  const m = minuten % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00 h`;
+}
+
+/* ── Initialisierung ───────────────────────────────────────── */
+
+loadMilitaerStatus();

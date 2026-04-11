@@ -744,3 +744,98 @@ a {
   color: #a0c8a0;
   margin-bottom: 8px;
 }
+
+/* ── Militärseite ──────────────────────────────────────────── */
+
+.mil-kaserne-status {
+  padding: 8px 0;
+}
+
+.mil-stufe-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.mil-stufe-label {
+  font-weight: bold;
+  color: #a0c8a0;
+  min-width: 120px;
+}
+
+.mil-stufe-val {
+  color: #e8e8e8;
+  font-size: 15px;
+}
+
+.mil-upgrade-box {
+  background: #232830;
+  border: 1px solid #3a3f4a;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-top: 10px;
+  max-width: 340px;
+}
+
+.mil-max-stufe {
+  color: #a0c8a0;
+  font-style: italic;
+  margin-top: 8px;
+}
+
+.mil-not-possible {
+  color: #c0392b;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Einheitenzeile */
+.mil-einheit-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 160px 160px;
+  gap: 12px;
+  align-items: start;
+  padding: 10px 0;
+  border-bottom: 1px solid #2e333c;
+}
+
+.mil-einheit-row:last-child {
+  border-bottom: none;
+}
+
+.mil-einheit-locked {
+  opacity: 0.55;
+}
+
+.mil-einheit-placeholder {
+  width: 70px;
+  height: 70px;
+}
+
+.mil-einheit-name {
+  font-weight: bold;
+  font-size: 14px;
+  color: #e8e8e8;
+  margin-bottom: 4px;
+}
+
+.mil-einheit-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  color: #b8b8b8;
+}
+
+.mil-einheit-vorhanden {
+  font-size: 12px;
+  color: #a0c8a0;
+  margin-top: 4px;
+}
+
+.mil-einheit-ausbilden {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

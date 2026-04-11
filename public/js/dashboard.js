@@ -3,6 +3,23 @@
  * Benötigt: utils.js (escapeHtml, setEl, postData)
  */
 
+/* ── Militär-Navigationslink aktualisieren ─────────────────── */
+
+function updateMilitaerNav(gebaeude) {
+  const hasMilitaer = gebaeude && gebaeude.some(
+    (g) => g.kategorie === 'Militär' && Number(g.anzahl) > 0
+  );
+  const navMilitaer = document.getElementById('navMilitaer');
+  if (navMilitaer) {
+    if (hasMilitaer) {
+      navMilitaer.href = 'militaer.html';
+      navMilitaer.classList.remove('nav-italic');
+    } else {
+      navMilitaer.href = '#';
+    }
+  }
+}
+
 /* ── Gebäudeliste ──────────────────────────────────────────── */
 
 function renderGebaeudeListe(gebaeude) {
@@ -81,6 +98,7 @@ function renderStatus(data) {
   setEl("letzteAktualisierung", new Date(data.letzteAktualisierung).toLocaleString("de-DE"));
 
   renderGebaeudeListe(data.gebaeude);
+  updateMilitaerNav(data.gebaeude);
 }
 
 /* ── Dashboard laden ───────────────────────────────────────── */

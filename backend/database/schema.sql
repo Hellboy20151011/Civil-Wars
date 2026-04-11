@@ -43,7 +43,35 @@ CREATE TABLE IF NOT EXISTS spieler_gebaeude (
     spieler_id INTEGER NOT NULL REFERENCES spieler(id) ON DELETE CASCADE,
     gebaeude_typ_id INTEGER NOT NULL REFERENCES gebaeude_typen(id) ON DELETE CASCADE,
     anzahl INTEGER NOT NULL DEFAULT 0,
+    stufe INTEGER NOT NULL DEFAULT 1,
     PRIMARY KEY (spieler_id, gebaeude_typ_id)
+);
+
+CREATE TABLE IF NOT EXISTS kaserne_stufen (
+    stufe             INTEGER PRIMARY KEY,
+    kosten_geld       BIGINT  NOT NULL DEFAULT 0,
+    kosten_stein      BIGINT  NOT NULL DEFAULT 0,
+    kosten_eisen      BIGINT  NOT NULL DEFAULT 0,
+    bauzeit_minuten   INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS einheiten_typen (
+    id                  SERIAL  PRIMARY KEY,
+    name                VARCHAR(100) NOT NULL UNIQUE,
+    kaserne_stufe_min   INTEGER NOT NULL DEFAULT 1,
+    angriff             INTEGER NOT NULL DEFAULT 0,
+    abwehr              INTEGER NOT NULL DEFAULT 0,
+    kosten_geld         BIGINT  NOT NULL DEFAULT 0,
+    kosten_stein        BIGINT  NOT NULL DEFAULT 0,
+    kosten_eisen        BIGINT  NOT NULL DEFAULT 0,
+    reisezeit_minuten   INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS spieler_einheiten (
+    spieler_id      INTEGER NOT NULL REFERENCES spieler(id) ON DELETE CASCADE,
+    einheit_typ_id  INTEGER NOT NULL REFERENCES einheiten_typen(id) ON DELETE CASCADE,
+    anzahl          INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (spieler_id, einheit_typ_id)
 );
 
 CREATE TABLE IF NOT EXISTS user_sessions (
@@ -66,7 +94,7 @@ VALUES
     ('Metallwerk',          'Industrie',  'Metall wird zum Bau von Gebäuden und zur Produktion von Panzern, Schiffen, Flugzeugen und Verteidigungsanlagen benötigt. Jedes Metallwerk produziert 60 t Eisen.',                                                    150000, 75,  50,  0,  0,    0,  60, 0, 0,  2, 0,  8),
     ('Bohrturm',            'Industrie',  'Der Bohrturm fördert Rohöl, welches in der Öl-Raffinerie zu Treibstoff umgewandelt werden kann. Jeder Bohrturm kann maximal 5 Öl-Raffinerien mit Rohöl versorgen.',                                                  200000, 20,  100, 0,  0,    0,  0,  0, 0,  3, 0,  8),
     ('Öl-Raffinerie',       'Industrie',  'Die Öl-Raffinerie wandelt Rohöl in Treibstoff um. Treibstoff benötigst du zum Angreifen oder Spionieren. Jede Öl-Raffinerie produziert 50 l Treibstoff.',                                                             300000, 100, 100, 0,  0,    0,  0,  50, 0,  3, 0,  8),
-    ('Kaserne',             'Militär',    'Dort wird die Infanterie ausgebildet.',                                                                                                                                                                                10000,  100, 50,  20, 0,    0,  0,  0, 0,  6, 0,  15),
+    ('Kaserne',             'Militär',    'Dort wird die Infanterie ausgebildet.',                                                                                                                                                                                500000, 150, 200, 0,  0,    0,  0,  0, 0,  10, 0, 15),
     -- Costs and build times for the following buildings are not yet defined in the design spec (placeholder values).
     ('Fahrzeugfabrik',      'Militär',    'Dort werden sämtliche Fahrzeuge produziert.',                                                                                                                                                                          0,      0,   0,   0,  0,    0,  0,  0, 0,  0, 0,  0),
     ('Flughafen',           'Militär',    'Hier werden sämtliche Lufteinheiten gebaut.',                                                                                                                                                                          0,      0,   0,   0,  0,    0,  0,  0, 0,  0, 0,  0),
@@ -89,3 +117,30 @@ ON CONFLICT (name) DO UPDATE SET
     strom_verbrauch      = EXCLUDED.strom_verbrauch,
     bewohner             = EXCLUDED.bewohner,
     bauzeit_minuten      = EXCLUDED.bauzeit_minuten;
+
+INSERT INTO kaserne_stufen (stufe, kosten_geld, kosten_stein, kosten_eisen, bauzeit_minuten)
+VALUES
+    (1,   500000,   150,   200, 15),
+    (2,  1000000,   200,   500, 20),
+    (3,  2500000,   500,   800, 30),
+    (4, 10000000,  1000,  1500, 45)
+ON CONFLICT (stufe) DO UPDATE SET
+    kosten_geld     = EXCLUDED.kosten_geld,
+    kosten_stein    = EXCLUDED.kosten_stein,
+    kosten_eisen    = EXCLUDED.kosten_eisen,
+    bauzeit_minuten = EXCLUDED.bauzeit_minuten;
+
+INSERT INTO einheiten_typen (name, kaserne_stufe_min, angriff, abwehr, kosten_geld, kosten_stein, kosten_eisen, reisezeit_minuten)
+VALUES
+    ('Panzergrenadier',  1, 3,  3,  20000,  30,  50, 1440),
+    ('Kampftaucher',     2, 6,  7,  40000,  60, 120, 1440),
+    ('Fallschirmjäger',  3, 13, 10, 75000, 150, 200, 1440),
+    ('Elitesoldat',      4, 25, 20, 200000, 300, 500, 1440)
+ON CONFLICT (name) DO UPDATE SET
+    kaserne_stufe_min = EXCLUDED.kaserne_stufe_min,
+    angriff           = EXCLUDED.angriff,
+    abwehr            = EXCLUDED.abwehr,
+    kosten_geld       = EXCLUDED.kosten_geld,
+    kosten_stein      = EXCLUDED.kosten_stein,
+    kosten_eisen      = EXCLUDED.kosten_eisen,
+    reisezeit_minuten = EXCLUDED.reisezeit_minuten;

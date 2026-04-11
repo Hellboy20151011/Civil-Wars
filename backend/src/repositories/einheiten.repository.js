@@ -1,0 +1,55 @@
+'use strict';
+
+const pool = require('../db');
+
+async function findAllEinheitenTypen(client = pool) {
+  const result = await client.query('SELECT * FROM einheiten_typen ORDER BY kaserne_stufe_min, id');
+  return result.rows;
+}
+
+async function findSpielerEinheiten(spielerId, client = pool) {
+  const result = await client.query(
+    `SELECT
+        et.id,
+        et.name,
+        et.kaserne_stufe_min,
+        et.angriff,
+        et.abwehr,
+        et.kosten_geld,
+        et.kosten_stein,
+        et.kosten_eisen,
+        et.reisezeit_minuten,
+        COALESCE(se.anzahl, 0) AS anzahl
+     FROM einheiten_typen et
+     LEFT JOIN spieler_einheiten se
+           ON se.einheit_typ_id = et.id AND se.spieler_id = $1
+     ORDER BY et.kaserne_stufe_min, et.id`,
+    [spielerId]
+  );
+  return result.rows;
+}
+
+async function upsertSpielerEinheiten(spielerId, einheitTypId, anzahl, client = pool) {
+  await client.query(
+    `INSERT INTO spieler_einheiten (spieler_id, einheit_typ_id, anzahl)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (spieler_id, einheit_typ_id)
+     DO UPDATE SET anzahl = spieler_einheiten.anzahl + $3`,
+    [spielerId, einheitTypId, anzahl]
+  );
+}
+
+async function findEinheitTypById(id, client = pool) {
+  const result = await client.query(
+    'SELECT * FROM einheiten_typen WHERE id = $1',
+    [id]
+  );
+  return result.rows[0] || null;
+}
+
+module.exports = {
+  findAllEinheitenTypen,
+  findSpielerEinheiten,
+  upsertSpielerEinheiten,
+  findEinheitTypById,
+};

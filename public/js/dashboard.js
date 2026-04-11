@@ -210,7 +210,19 @@ async function loadBuildingTypes() {
             </div>
             <div class="bau-card-img">
               <div class="bau-img-placeholder"></div>
-              <button class="bau-btn-bauen" onclick="buildBuilding(${parseInt(building.id, 10)})">Bauen</button>
+              <div class="bau-anzahl-row">
+                <input
+                  type="number"
+                  id="anzahl-${parseInt(building.id, 10)}"
+                  class="bau-anzahl-input"
+                  min="1"
+                  max="${derzeit}"
+                  value="${derzeit === 0 ? 0 : 1}"
+                  ${derzeit === 0 ? "disabled" : ""}
+                >
+                <button class="bau-btn-bauen" onclick="buildBuilding(${parseInt(building.id, 10)})" ${derzeit === 0 ? "disabled" : ""}>Bauen</button>
+              </div>
+              <p class="bau-anzahl-max">${escapeHtml(String(derzeit))} maximal</p>
             </div>
           </div>
         </div>
@@ -231,8 +243,10 @@ document.addEventListener("click", async (e) => {
 
 async function buildBuilding(gebaeudeTypId) {
   const message = document.getElementById("message");
+  const input = document.getElementById(`anzahl-${gebaeudeTypId}`);
+  const anzahl = input ? Math.max(1, parseInt(input.value, 10) || 1) : 1;
 
-  const result = await postData("/api/buildings/build", { gebaeudeTypId });
+  const result = await postData("/api/buildings/build", { gebaeudeTypId, anzahl });
   if (message) message.textContent = result.message;
 
   if (result.status) {

@@ -531,8 +531,46 @@ body {
   cursor: pointer;
 }
 
-.bau-btn-bauen:hover {
+.bau-btn-bauen:hover:not(:disabled) {
   background: #4a8f4a;
+}
+
+.bau-btn-bauen:disabled {
+  background: #2a4a2a;
+  border-color: #3a5a3a;
+  color: #777;
+  cursor: not-allowed;
+}
+
+.bau-anzahl-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.bau-anzahl-input {
+  width: 54px;
+  padding: 4px 6px;
+  font-size: 12px;
+  background: #23272f;
+  border: 1px solid #3a3f4a;
+  color: #fff;
+  border-radius: 3px;
+  text-align: center;
+}
+
+.bau-anzahl-input:disabled {
+  color: #555;
+  border-color: #2e3340;
+  cursor: not-allowed;
+}
+
+.bau-anzahl-max {
+  font-size: 11px;
+  color: #888;
+  margin: 3px 0 0 0;
+  text-align: right;
 }
 
 /* Right sidebar */

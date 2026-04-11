@@ -15,7 +15,7 @@ async function build(req, res) {
   const client = await pool.connect();
   try {
     const spielerId = req.session.spieler.id;
-    const { gebaeudeTypId } = req.body;
+    const { gebaeudeTypId, anzahl = 1 } = req.body;
 
     await client.query('BEGIN');
 
@@ -39,19 +39,19 @@ async function build(req, res) {
       return res.status(404).json({ message: 'Ressourcen nicht gefunden' });
     }
 
-    if (Number(ressourcen.geld) < Number(gebaeude.kosten_geld)) {
+    if (Number(ressourcen.geld) < Number(gebaeude.kosten_geld) * anzahl) {
       await client.query('ROLLBACK');
       return res.status(400).json({ message: 'Zu wenig Geld' });
     }
-    if (Number(ressourcen.stein) < Number(gebaeude.kosten_stein)) {
+    if (Number(ressourcen.stein) < Number(gebaeude.kosten_stein) * anzahl) {
       await client.query('ROLLBACK');
       return res.status(400).json({ message: 'Zu wenig Stein' });
     }
-    if (Number(ressourcen.eisen) < Number(gebaeude.kosten_eisen)) {
+    if (Number(ressourcen.eisen) < Number(gebaeude.kosten_eisen) * anzahl) {
       await client.query('ROLLBACK');
       return res.status(400).json({ message: 'Zu wenig Eisen' });
     }
-    if (Number(ressourcen.treibstoff) < Number(gebaeude.kosten_treibstoff)) {
+    if (Number(ressourcen.treibstoff) < Number(gebaeude.kosten_treibstoff) * anzahl) {
       await client.query('ROLLBACK');
       return res.status(400).json({ message: 'Zu wenig Treibstoff' });
     }
@@ -59,8 +59,8 @@ async function build(req, res) {
     const statusVorher = await economyService.getGebaeudeStatus(spielerId, client);
     const neueFreieLeistung =
       statusVorher.strom.produktion +
-      Number(gebaeude.strom_produktion) -
-      (statusVorher.strom.verbrauch + Number(gebaeude.strom_verbrauch));
+      Number(gebaeude.strom_produktion) * anzahl -
+      (statusVorher.strom.verbrauch + Number(gebaeude.strom_verbrauch) * anzahl);
 
     if (neueFreieLeistung < 0) {
       await client.query('ROLLBACK');
@@ -69,20 +69,21 @@ async function build(req, res) {
 
     await resourcesRepo.deductResources(
       spielerId,
-      gebaeude.kosten_geld,
-      gebaeude.kosten_stein,
-      gebaeude.kosten_eisen,
-      gebaeude.kosten_treibstoff,
+      Number(gebaeude.kosten_geld) * anzahl,
+      Number(gebaeude.kosten_stein) * anzahl,
+      Number(gebaeude.kosten_eisen) * anzahl,
+      Number(gebaeude.kosten_treibstoff) * anzahl,
       client
     );
 
-    await buildingRepo.upsertSpielerGebaeude(spielerId, gebaeudeTypId, client);
+    await buildingRepo.upsertSpielerGebaeude(spielerId, gebaeudeTypId, anzahl, client);
 
     const statusNeu = await playerService.getSpielerStatus(spielerId, client);
 
     await client.query('COMMIT');
 
-    res.json({ message: `${gebaeude.name} erfolgreich gebaut`, status: statusNeu });
+    const label = anzahl > 1 ? `${anzahl}x ${gebaeude.name}` : gebaeude.name;
+    res.json({ message: `${label} erfolgreich gebaut`, status: statusNeu });
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;

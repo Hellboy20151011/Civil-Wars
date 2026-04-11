@@ -64,7 +64,8 @@ CREATE TABLE IF NOT EXISTS einheiten_typen (
     kosten_geld         BIGINT  NOT NULL DEFAULT 0,
     kosten_stein        BIGINT  NOT NULL DEFAULT 0,
     kosten_eisen        BIGINT  NOT NULL DEFAULT 0,
-    reisezeit_minuten   INTEGER NOT NULL DEFAULT 0
+    reisezeit_minuten   INTEGER NOT NULL DEFAULT 0,
+    fabrik_typ          VARCHAR(100) NOT NULL DEFAULT 'Kaserne'
 );
 
 CREATE TABLE IF NOT EXISTS spieler_einheiten (
@@ -130,12 +131,15 @@ ON CONFLICT (stufe) DO UPDATE SET
     kosten_eisen    = EXCLUDED.kosten_eisen,
     bauzeit_minuten = EXCLUDED.bauzeit_minuten;
 
-INSERT INTO einheiten_typen (name, kaserne_stufe_min, angriff, abwehr, kosten_geld, kosten_stein, kosten_eisen, reisezeit_minuten)
+INSERT INTO einheiten_typen (name, kaserne_stufe_min, angriff, abwehr, kosten_geld, kosten_stein, kosten_eisen, reisezeit_minuten, fabrik_typ)
 VALUES
-    ('Panzergrenadier',  1, 3,  3,  20000,  30,  50, 1440),
-    ('Kampftaucher',     2, 6,  7,  40000,  60, 120, 1440),
-    ('Fallschirmjäger',  3, 13, 10, 75000, 150, 200, 1440),
-    ('Elitesoldat',      4, 25, 20, 200000, 300, 500, 1440)
+    ('Panzergrenadier',  1, 3,  3,  20000,  30,  50, 1440, 'Kaserne'),
+    ('Kampftaucher',     2, 6,  7,  40000,  60, 120, 1440, 'Kaserne'),
+    ('Fallschirmjäger',  3, 13, 10, 75000, 150, 200, 1440, 'Kaserne'),
+    ('Elitesoldat',      4, 25, 20, 200000, 300, 500, 1440, 'Kaserne'),
+    ('Geländewagen',     0,  4,  3,  30000,  20,  80, 1440, 'Fahrzeugfabrik'),
+    ('Schützenpanzer',   0, 10, 12,  80000,  50, 200, 1440, 'Fahrzeugfabrik'),
+    ('Kampfpanzer',      0, 22, 25, 200000, 100, 500, 1440, 'Fahrzeugfabrik')
 ON CONFLICT (name) DO UPDATE SET
     kaserne_stufe_min = EXCLUDED.kaserne_stufe_min,
     angriff           = EXCLUDED.angriff,
@@ -143,4 +147,5 @@ ON CONFLICT (name) DO UPDATE SET
     kosten_geld       = EXCLUDED.kosten_geld,
     kosten_stein      = EXCLUDED.kosten_stein,
     kosten_eisen      = EXCLUDED.kosten_eisen,
-    reisezeit_minuten = EXCLUDED.reisezeit_minuten;
+    reisezeit_minuten = EXCLUDED.reisezeit_minuten,
+    fabrik_typ        = EXCLUDED.fabrik_typ;

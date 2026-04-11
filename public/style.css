@@ -384,6 +384,157 @@ body {
   background: #4a8f4a;
 }
 
+/* Bauzentrum category tabs */
+.bau-tabs {
+  display: flex;
+  border-bottom: 1px solid #3a3f4a;
+  background: #1a1d24;
+  border-radius: 4px 4px 0 0;
+  flex-wrap: wrap;
+}
+
+.bau-tab {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 8px 18px;
+  width: auto;
+  border-radius: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.bau-tab:hover {
+  color: #fff;
+  background: #252930;
+}
+
+.bau-tab.active {
+  color: #fff;
+  font-weight: bold;
+  border-bottom: 3px solid #7cc8ff;
+  background: #252930;
+}
+
+/* Bauzentrum building cards */
+.bau-card {
+  border: 1px solid #3a3f4a;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.bau-card-header {
+  background: #1a1d24;
+  border-bottom: 1px solid #3a3f4a;
+  padding: 5px 12px;
+  font-weight: bold;
+  font-size: 13px;
+  color: #ddd;
+  text-align: center;
+}
+
+.bau-card-body {
+  display: flex;
+  gap: 0;
+  background: #23272f;
+  font-size: 12px;
+}
+
+.bau-card-left {
+  flex: 1;
+  padding: 8px 12px;
+  border-right: 1px solid #3a3f4a;
+  min-width: 0;
+}
+
+.bau-card-right {
+  flex: 0 0 200px;
+  padding: 8px 12px;
+  border-right: 1px solid #3a3f4a;
+}
+
+.bau-card-img {
+  flex: 0 0 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px;
+  gap: 6px;
+}
+
+.bau-card-section-title {
+  color: #ccc;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.bau-card-desc {
+  color: #bbb;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.bau-desc-line {
+  margin: 0 0 2px;
+}
+
+.bau-card-bauzeit {
+  color: #aaa;
+  margin-top: 4px;
+}
+
+.bau-cost-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.bau-cost-table td {
+  padding: 1px 4px;
+  color: #ccc;
+}
+
+.bau-cost-table td:last-child {
+  text-align: right;
+  color: #7cc8ff;
+}
+
+.bau-cost-table-sm {
+  margin-top: 6px;
+}
+
+.bau-cost-table-sm td {
+  color: #aaa;
+}
+
+.bau-img-placeholder {
+  width: 110px;
+  height: 75px;
+  background: #353b46;
+  border: 1px solid #3a3f4a;
+  border-radius: 3px;
+}
+
+.bau-btn-bauen {
+  width: auto;
+  padding: 5px 16px;
+  font-size: 12px;
+  background: #3a6f3a;
+  border: 1px solid #4a8f4a;
+  color: #fff;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.bau-btn-bauen:hover {
+  background: #4a8f4a;
+}
+
 /* Right sidebar */
 .game-sidebar {
   width: 200px;

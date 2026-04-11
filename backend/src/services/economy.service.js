@@ -34,7 +34,7 @@ async function getGebaeudeStatus(spielerId, client) {
   }
 
   /* Jeder Bewohner zahlt 1 € Steuern pro Tick */
-  steuerBasisBewohner = gesamtBewohner;
+  steuerBasisBewohner = 10 * gesamtBewohner;
   const produktionGeld = mieteinnahmen + steuerBasisBewohner + einnahmenSonstige;
 
   return {

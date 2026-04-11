@@ -208,13 +208,32 @@ async function loadBuildingTypes() {
       /* Beschreibung dynamisch aus Datenbankfeldern erzeugen */
       const bewohner = Number(building.bewohner || 0);
       const miete = Number(building.einkommen_geld || 0);
+      const prodStein = Number(building.produktion_stein || 0);
+      const prodEisen = Number(building.produktion_eisen || 0);
+      const prodTreibstoff = Number(building.produktion_treibstoff || 0);
+      const stromProduktion = Number(building.strom_produktion || 0);
       let descLines = '';
+      if (building.beschreibung) {
+        descLines += `<p class="bau-desc-line">${escapeHtml(building.beschreibung)}</p>`;
+      }
       if (bewohner > 0) {
         descLines += `<p class="bau-desc-line">Bietet Platz für ${bewohner.toLocaleString("de-DE")} Bewohner.</p>`;
         descLines += `<p class="bau-desc-line">Mieteinnahmen: ${miete.toLocaleString("de-DE")} € / Tick</p>`;
         descLines += `<p class="bau-desc-line">Steuereinnahmen: ${bewohner.toLocaleString("de-DE")} € / Tick</p>`;
       } else if (miete > 0) {
         descLines += `<p class="bau-desc-line">Einnahmen: ${miete.toLocaleString("de-DE")} € / Tick</p>`;
+      }
+      if (stromProduktion > 0) {
+        descLines += `<p class="bau-desc-line">Produziert: ${stromProduktion.toLocaleString("de-DE")} MWh Strom / Tick</p>`;
+      }
+      if (prodStein > 0) {
+        descLines += `<p class="bau-desc-line">Produziert: ${prodStein.toLocaleString("de-DE")} t Stein / Tick</p>`;
+      }
+      if (prodEisen > 0) {
+        descLines += `<p class="bau-desc-line">Produziert: ${prodEisen.toLocaleString("de-DE")} t Eisen / Tick</p>`;
+      }
+      if (prodTreibstoff > 0) {
+        descLines += `<p class="bau-desc-line">Produziert: ${prodTreibstoff.toLocaleString("de-DE")} l Treibstoff / Tick</p>`;
       }
 
       return `

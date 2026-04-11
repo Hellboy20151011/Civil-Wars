@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Minimale Berechtigungen – der Workflow braucht nur Lesezugriff auf den Code
+    permissions:
+      contents: read
 
     steps:
       # 1. Code auschecken

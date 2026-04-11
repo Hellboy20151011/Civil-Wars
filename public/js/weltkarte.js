@@ -94,7 +94,7 @@ function renderSpielerListe(alleSpieler, eigeneSpieler) {
     let reisezeit = '-';
 
     /* Entfernung und Reisezeit nur für andere Spieler berechnen */
-    if (!istEigener && eigeneSpieler.koordinate_x != null) {
+    if (!istEigener && eigeneSpieler.koordinate_x !== null) {
       const dist = berechneEntfernung(
         eigeneSpieler.koordinate_x,
         eigeneSpieler.koordinate_y,
@@ -134,8 +134,8 @@ async function ladeWeltkarte() {
   const eigeneSpieler = await meRes.json();
 
   /* Eigene Koordinaten im Header anzeigen */
-  const kx = eigeneSpieler.koordinate_x != null ? eigeneSpieler.koordinate_x : '-';
-  const ky = eigeneSpieler.koordinate_y != null ? eigeneSpieler.koordinate_y : '-';
+  const kx = eigeneSpieler.koordinate_x !== null ? eigeneSpieler.koordinate_x : '-';
+  const ky = eigeneSpieler.koordinate_y !== null ? eigeneSpieler.koordinate_y : '-';
   setEl('spielerName', eigeneSpieler.name);
   setEl('spielerKoord', kx + ':' + ky);
 

@@ -698,6 +698,11 @@ a {
   font-weight: bold;
 }
 
+/* Hilfsklasse für zentrierten Text */
+.text-center {
+  text-align: center;
+}
+
 .nav {
   display: flex;
   justify-content: space-between;

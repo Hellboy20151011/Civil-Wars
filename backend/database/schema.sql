@@ -9,13 +9,16 @@ CREATE TABLE IF NOT EXISTS spieler (
     UNIQUE (koordinate_x, koordinate_y)
 );
 
+-- Hinweis für bestehende Datenbanken: Die Spalte "strom" wurde entfernt, da der Stromwert
+-- nicht gespeichert, sondern dynamisch aus den Gebäudedaten berechnet wird.
+-- Auf vorhandenen Datenbanken einmalig ausführen:
+-- ALTER TABLE spieler_ressourcen DROP COLUMN IF EXISTS strom;
 CREATE TABLE IF NOT EXISTS spieler_ressourcen (
     id SERIAL PRIMARY KEY,
     spieler_id INTEGER NOT NULL UNIQUE REFERENCES spieler(id) ON DELETE CASCADE,
     geld BIGINT NOT NULL DEFAULT 500000,
     stein BIGINT NOT NULL DEFAULT 500,
     eisen BIGINT NOT NULL DEFAULT 200,
-    strom BIGINT NOT NULL DEFAULT 100,
     treibstoff BIGINT NOT NULL DEFAULT 50,
     letzte_aktualisierung TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

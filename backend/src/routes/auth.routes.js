@@ -12,7 +12,7 @@ const router = Router();
 const registerSchema = z.object({
   name: z.string().min(1, 'Name darf nicht leer sein'),
   email: z.string().email('Ungültige E-Mail-Adresse'),
-  passwort: z.string().min(1, 'Passwort darf nicht leer sein'),
+  passwort: z.string().min(8, 'Passwort muss mindestens 8 Zeichen lang sein'),
 });
 
 const loginSchema = z.object({

@@ -1,3 +1,12 @@
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 async function postData(url, data) {
   const response = await fetch(url, {
     method: "POST",
@@ -62,9 +71,9 @@ function renderGebaeudeListe(gebaeude) {
     .map(
       (g) => `
         <div class="building-item">
-          <strong>${g.name}</strong> (${g.kategorie})<br>
-          Anzahl: ${g.anzahl}<br>
-          Strom: +${g.strom_produktion} / -${g.strom_verbrauch}
+          <strong>${escapeHtml(g.name)}</strong> (${escapeHtml(g.kategorie)})<br>
+          Anzahl: ${escapeHtml(g.anzahl)}<br>
+          Strom: +${escapeHtml(g.strom_produktion)} / -${escapeHtml(g.strom_verbrauch)}
         </div>
       `
     )
@@ -119,26 +128,32 @@ async function loadBuildingTypes() {
   if (!container) return;
 
   const response = await fetch("/api/buildings/types");
+
+  if (!response.ok) {
+    container.innerHTML = "<p>Gebäudetypen konnten nicht geladen werden.</p>";
+    return;
+  }
+
   const buildingTypes = await response.json();
 
   container.innerHTML = buildingTypes
     .map(
       (building) => `
         <div class="building-item">
-          <strong>${building.name}</strong> (${building.kategorie})<br>
+          <strong>${escapeHtml(building.name)}</strong> (${escapeHtml(building.kategorie)})<br>
           Kosten:
-          Geld ${building.kosten_geld},
-          Stein ${building.kosten_stein},
-          Eisen ${building.kosten_eisen},
-          Treibstoff ${building.kosten_treibstoff}<br>
+          Geld ${escapeHtml(building.kosten_geld)},
+          Stein ${escapeHtml(building.kosten_stein)},
+          Eisen ${escapeHtml(building.kosten_eisen)},
+          Treibstoff ${escapeHtml(building.kosten_treibstoff)}<br>
           Produktion:
-          Geld ${building.einkommen_geld},
-          Stein ${building.produktion_stein},
-          Eisen ${building.produktion_eisen},
-          Treibstoff ${building.produktion_treibstoff}<br>
+          Geld ${escapeHtml(building.einkommen_geld)},
+          Stein ${escapeHtml(building.produktion_stein)},
+          Eisen ${escapeHtml(building.produktion_eisen)},
+          Treibstoff ${escapeHtml(building.produktion_treibstoff)}<br>
           Strom:
-          +${building.strom_produktion} / -${building.strom_verbrauch}<br><br>
-          <button onclick="buildBuilding(${building.id})">Bauen</button>
+          +${escapeHtml(building.strom_produktion)} / -${escapeHtml(building.strom_verbrauch)}<br><br>
+          <button onclick="buildBuilding(${escapeHtml(String(parseInt(building.id, 10)))})">Bauen</button>
         </div>
       `
     )
@@ -152,9 +167,7 @@ async function buildBuilding(gebaeudeTypId) {
   message.textContent = result.message;
 
   if (result.status) {
-    const meResponse = await fetch("/api/me");
-    const meData = await meResponse.json();
-    renderStatus(meData);
+    renderStatus(result.status);
   }
 }
 

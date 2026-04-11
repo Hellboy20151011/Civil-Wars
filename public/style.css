@@ -87,3 +87,10 @@ a {
   border-radius: 10px;
   text-align: center;
 }
+
+.building-item {
+  background: #353b46;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}

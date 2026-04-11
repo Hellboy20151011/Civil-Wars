@@ -25,10 +25,47 @@
         <div class="resource-box">Geld<br><strong id="geld"></strong></div>
         <div class="resource-box">Stein<br><strong id="stein"></strong></div>
         <div class="resource-box">Eisen<br><strong id="eisen"></strong></div>
-        <div class="resource-box">Strom<br><strong id="strom"></strong></div>
         <div class="resource-box">Treibstoff<br><strong id="treibstoff"></strong></div>
       </div>
     </div>
+
+    <div class="card">
+      <h2>Strom</h2>
+      <div class="resources">
+        <div class="resource-box">Produktion<br><strong id="stromProduktion"></strong></div>
+        <div class="resource-box">Verbrauch<br><strong id="stromVerbrauch"></strong></div>
+        <div class="resource-box">Frei<br><strong id="stromFrei"></strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Produktion pro Tick</h2>
+      <div class="resources">
+        <div class="resource-box">Geld<br><strong id="prodGeld"></strong></div>
+        <div class="resource-box">Stein<br><strong id="prodStein"></strong></div>
+        <div class="resource-box">Eisen<br><strong id="prodEisen"></strong></div>
+        <div class="resource-box">Treibstoff<br><strong id="prodTreibstoff"></strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Deine Gebäude</h2>
+      <div id="meineGebaeudeListe"></div>
+    </div>
+
+    <div class="card">
+      <h2>Gebäude bauen</h2>
+      <div id="buildingTypes"></div>
+    </div>
+
+    <div class="card">
+      <h2>Tick-System</h2>
+      <p><strong>Tickdauer:</strong> <span id="tickDauer"></span> Sekunden</p>
+      <p><strong>Zuletzt verrechnete Ticks:</strong> <span id="ticksVerrechnet"></span></p>
+      <p><strong>Letzte Aktualisierung:</strong> <span id="letzteAktualisierung"></span></p>
+    </div>
+
+    <div class="message" id="message"></div>
   </div>
 
   <script src="app.js"></script>

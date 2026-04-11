@@ -49,6 +49,17 @@ async function findBySpieler(spielerId, client = pool) {
   return result.rows;
 }
 
+async function findSpielerGebaeudeAnzahlByName(spielerId, name, client = pool) {
+  const result = await client.query(
+    `SELECT sg.anzahl
+     FROM spieler_gebaeude sg
+     JOIN gebaeude_typen gt ON gt.id = sg.gebaeude_typ_id
+     WHERE sg.spieler_id = $1 AND gt.name = $2`,
+    [spielerId, name]
+  );
+  return result.rows[0] ? Number(result.rows[0].anzahl) : 0;
+}
+
 async function upsertSpielerGebaeude(spielerId, gebaeudeTypId, anzahl = 1, client = pool) {
   await client.query(
     `INSERT INTO spieler_gebaeude (spieler_id, gebaeude_typ_id, anzahl)
@@ -64,5 +75,6 @@ module.exports = {
   findTypById,
   findHauptgebaeude,
   findBySpieler,
+  findSpielerGebaeudeAnzahlByName,
   upsertSpielerGebaeude,
 };

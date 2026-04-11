@@ -42,4 +42,12 @@ async function create(name, email, passwortHash, koordinateX, koordinateY, clien
   return result.rows[0];
 }
 
-module.exports = { findById, findByNameOrEmail, findByEmail, findByKoordinaten, create };
+/* Alle Spieler mit ihren Koordinaten laden (für die Weltkarte) */
+async function findAll(client = pool) {
+  const result = await client.query(
+    'SELECT id, name, koordinate_x, koordinate_y FROM spieler ORDER BY name'
+  );
+  return result.rows;
+}
+
+module.exports = { findById, findByNameOrEmail, findByEmail, findByKoordinaten, findAll, create };

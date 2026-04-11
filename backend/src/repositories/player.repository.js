@@ -4,8 +4,16 @@ const pool = require('../db');
 
 async function findById(id, client = pool) {
   const result = await client.query(
-    'SELECT id, name, email FROM spieler WHERE id = $1',
+    'SELECT id, name, email, koordinate_x, koordinate_y FROM spieler WHERE id = $1',
     [id]
+  );
+  return result.rows[0] || null;
+}
+
+async function findByKoordinaten(x, y, client = pool) {
+  const result = await client.query(
+    'SELECT id FROM spieler WHERE koordinate_x = $1 AND koordinate_y = $2',
+    [x, y]
   );
   return result.rows[0] || null;
 }
@@ -26,12 +34,12 @@ async function findByEmail(email, client = pool) {
   return result.rows[0] || null;
 }
 
-async function create(name, email, passwortHash, client = pool) {
+async function create(name, email, passwortHash, koordinateX, koordinateY, client = pool) {
   const result = await client.query(
-    'INSERT INTO spieler (name, email, passwort_hash) VALUES ($1, $2, $3) RETURNING id, name, email',
-    [name, email, passwortHash]
+    'INSERT INTO spieler (name, email, passwort_hash, koordinate_x, koordinate_y) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, koordinate_x, koordinate_y',
+    [name, email, passwortHash, koordinateX, koordinateY]
   );
   return result.rows[0];
 }
 
-module.exports = { findById, findByNameOrEmail, findByEmail, create };
+module.exports = { findById, findByNameOrEmail, findByEmail, findByKoordinaten, create };

@@ -49,13 +49,13 @@ async function findBySpieler(spielerId, client = pool) {
   return result.rows;
 }
 
-async function upsertSpielerGebaeude(spielerId, gebaeudeTypId, client = pool) {
+async function upsertSpielerGebaeude(spielerId, gebaeudeTypId, anzahl = 1, client = pool) {
   await client.query(
     `INSERT INTO spieler_gebaeude (spieler_id, gebaeude_typ_id, anzahl)
-     VALUES ($1, $2, 1)
+     VALUES ($1, $2, $3)
      ON CONFLICT (spieler_id, gebaeude_typ_id)
-     DO UPDATE SET anzahl = spieler_gebaeude.anzahl + 1`,
-    [spielerId, gebaeudeTypId]
+     DO UPDATE SET anzahl = spieler_gebaeude.anzahl + $3`,
+    [spielerId, gebaeudeTypId, anzahl]
   );
 }
 

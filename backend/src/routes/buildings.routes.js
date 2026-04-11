@@ -12,6 +12,7 @@ const router = Router();
 
 const buildSchema = z.object({
   gebaeudeTypId: z.coerce.number().int().positive('gebaeudeTypId muss eine positive Ganzzahl sein'),
+  anzahl: z.coerce.number().int().min(1, 'anzahl muss mindestens 1 sein').default(1),
 });
 
 router.get('/types', requireLogin, apiLimiter, asyncWrapper(buildingsController.getTypes));

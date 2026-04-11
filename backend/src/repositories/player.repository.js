@@ -1,6 +1,6 @@
 'use strict';
 
-const pool = require('../../db');
+const pool = require('../db');
 
 async function findById(id, client = pool) {
   const result = await client.query(

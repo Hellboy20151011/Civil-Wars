@@ -1,6 +1,6 @@
 'use strict';
 
-const pool = require('../../db');
+const pool = require('../db');
 const playerService = require('../services/player.service');
 
 async function me(req, res) {

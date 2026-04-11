@@ -1,6 +1,6 @@
 'use strict';
 
-const pool = require('../../db');
+const pool = require('../db');
 const buildingRepo = require('../repositories/building.repository');
 const resourcesRepo = require('../repositories/resources.repository');
 const economyService = require('../services/economy.service');

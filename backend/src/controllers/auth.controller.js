@@ -1,7 +1,7 @@
 'use strict';
 
 const bcrypt = require('bcrypt');
-const pool = require('../../db');
+const pool = require('../db');
 const playerRepo = require('../repositories/player.repository');
 const buildingRepo = require('../repositories/building.repository');
 const resourcesRepo = require('../repositories/resources.repository');

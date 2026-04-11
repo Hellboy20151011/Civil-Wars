@@ -1,6 +1,6 @@
 'use strict';
 
-const pool = require('../../db');
+const pool = require('../db');
 
 async function findAllTypes(client = pool) {
   const result = await client.query('SELECT * FROM gebaeude_typen ORDER BY id');

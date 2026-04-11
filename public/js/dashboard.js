@@ -1,67 +1,9 @@
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+/**
+ * dashboard.js – Dashboard, Gebäudeverwaltung & Logout
+ * Benötigt: utils.js (escapeHtml, setEl, postData)
+ */
 
-function setEl(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = value;
-}
-
-async function postData(url, data) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-  });
-
-  return response.json();
-}
-
-/* Registrierung */
-const registerForm = document.getElementById("registerForm");
-if (registerForm) {
-  registerForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const passwort = document.getElementById("passwort").value;
-    const message = document.getElementById("message");
-
-    const result = await postData("/api/register", { name, email, passwort });
-    message.textContent = result.message;
-
-    if (result.spieler) {
-      window.location.href = "/dashboard.html";
-    }
-  });
-}
-
-/* Login */
-const loginForm = document.getElementById("loginForm");
-if (loginForm) {
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById("email").value;
-    const passwort = document.getElementById("passwort").value;
-    const message = document.getElementById("message");
-
-    const result = await postData("/api/login", { email, passwort });
-    message.textContent = result.message;
-
-    if (result.spieler) {
-      window.location.href = "/dashboard.html";
-    }
-  });
-}
+/* ── Gebäudeliste ──────────────────────────────────────────── */
 
 function renderGebaeudeListe(gebaeude) {
   const container = document.getElementById("meineGebaeudeListe");
@@ -85,6 +27,8 @@ function renderGebaeudeListe(gebaeude) {
     .join("");
 }
 
+/* ── Uhr im Header ─────────────────────────────────────────── */
+
 function startClock() {
   const clockEl = document.getElementById("headerTime");
   if (!clockEl) return;
@@ -97,6 +41,8 @@ function startClock() {
   tick();
   setInterval(tick, 1000);
 }
+
+/* ── Spielerstatus rendern ─────────────────────────────────── */
 
 function renderStatus(data) {
   setEl("spielerName", data.name);
@@ -113,27 +59,28 @@ function renderStatus(data) {
   setEl("stromFrei", data.strom.frei);
 
   const einnahmen = data.einnahmen || {};
-  const gesamtEinnahmen = Number(einnahmen.gesamt ?? data.produktion.geld);
-  const mietEinnahmen   = Number(einnahmen.miete   ?? 0);
-  const steuerEinnahmen = Number(einnahmen.steuern ?? 0);
-  const sonstigeEinnahmen = Number(einnahmen.sonstige ?? data.produktion.geld);
+  const gesamtEinnahmen   = Number(einnahmen.gesamt   ?? data.produktion.geld);
+  const mietEinnahmen     = Number(einnahmen.miete     ?? 0);
+  const steuerEinnahmen   = Number(einnahmen.steuern   ?? 0);
+  const sonstigeEinnahmen = Number(einnahmen.sonstige  ?? data.produktion.geld);
 
-  setEl("einBauzentrale", sonstigeEinnahmen.toLocaleString("de-DE") + " €");
+  setEl("einBauzentrale",   sonstigeEinnahmen.toLocaleString("de-DE") + " €");
   setEl("einMieteinnahmen", mietEinnahmen.toLocaleString("de-DE") + " €");
-  setEl("einSteuern", steuerEinnahmen.toLocaleString("de-DE") + " €");
-  setEl("gesamtGeld", gesamtEinnahmen.toLocaleString("de-DE") + " €");
-  setEl("prodGeld", gesamtEinnahmen.toLocaleString("de-DE") + " €");
-  setEl("prodStein", Number(data.produktion.stein).toLocaleString("de-DE") + " t");
-  setEl("prodEisen", Number(data.produktion.eisen).toLocaleString("de-DE") + " t");
-  setEl("prodTreibstoff", Number(data.produktion.treibstoff).toLocaleString("de-DE") + " Barrel");
+  setEl("einSteuern",       steuerEinnahmen.toLocaleString("de-DE") + " €");
+  setEl("gesamtGeld",       gesamtEinnahmen.toLocaleString("de-DE") + " €");
+  setEl("prodGeld",         gesamtEinnahmen.toLocaleString("de-DE") + " €");
+  setEl("prodStein",        Number(data.produktion.stein).toLocaleString("de-DE") + " t");
+  setEl("prodEisen",        Number(data.produktion.eisen).toLocaleString("de-DE") + " t");
+  setEl("prodTreibstoff",   Number(data.produktion.treibstoff).toLocaleString("de-DE") + " Barrel");
 
-  setEl("tickDauer", data.tickDauerSekunden);
-  setEl("ticksVerrechnet", data.ticksVerrechnet);
-  setEl("letzteAktualisierung",
-    new Date(data.letzteAktualisierung).toLocaleString("de-DE"));
+  setEl("tickDauer",            data.tickDauerSekunden);
+  setEl("ticksVerrechnet",      data.ticksVerrechnet);
+  setEl("letzteAktualisierung", new Date(data.letzteAktualisierung).toLocaleString("de-DE"));
 
   renderGebaeudeListe(data.gebaeude);
 }
+
+/* ── Dashboard laden ───────────────────────────────────────── */
 
 async function loadDashboard() {
   const spielerName = document.getElementById("spielerName");
@@ -152,6 +99,8 @@ async function loadDashboard() {
 
   await loadBuildingTypes();
 }
+
+/* ── Gebäudetypen im Bauzentrum laden ─────────────────────── */
 
 async function loadBuildingTypes() {
   const container = document.getElementById("buildingTypes");
@@ -182,7 +131,7 @@ async function loadBuildingTypes() {
   const activeTab = document.querySelector(".bau-tab.active");
   const aktiveKategorie = activeTab ? activeTab.dataset.kategorie : "Unterkunft";
 
-  const filtered = allBuildingTypes.filter(b => b.kategorie === aktiveKategorie);
+  const filtered = allBuildingTypes.filter((b) => b.kategorie === aktiveKategorie);
 
   if (filtered.length === 0) {
     container.innerHTML = '<p class="empty-state">Keine Gebäude in dieser Kategorie.</p>';
@@ -191,28 +140,29 @@ async function loadBuildingTypes() {
 
   container.innerHTML = filtered
     .map((building) => {
-      const gebaut = spielerGebaeude.find(g => Number(g.id) === Number(building.id));
+      const gebaut = spielerGebaeude.find((g) => Number(g.id) === Number(building.id));
       const anzahlGebaut = gebaut ? Number(gebaut.anzahl) : 0;
 
-      /* Berechne wie viele Gebäude gerade baubar sind */
+      /* Berechne wie viele Gebäude derzeit baubar sind */
       let derzeit = 0;
       if (ressourcen) {
-        const maxGeld  = Number(building.kosten_geld)  > 0 ? Math.floor(Number(ressourcen.geld)  / Number(building.kosten_geld))  : Infinity;
-        const maxStein = Number(building.kosten_stein) > 0 ? Math.floor(Number(ressourcen.stein) / Number(building.kosten_stein)) : Infinity;
-        const maxEisen = Number(building.kosten_eisen) > 0 ? Math.floor(Number(ressourcen.eisen) / Number(building.kosten_eisen)) : Infinity;
-        const maxStrom = Number(building.strom_verbrauch) > 0 ? Math.floor(stromFrei / Number(building.strom_verbrauch)) : Infinity;
-        const finite = [maxGeld, maxStein, maxEisen, maxStrom].filter(v => v !== Infinity);
+        const maxGeld  = Number(building.kosten_geld)      > 0 ? Math.floor(Number(ressourcen.geld)  / Number(building.kosten_geld))      : Infinity;
+        const maxStein = Number(building.kosten_stein)     > 0 ? Math.floor(Number(ressourcen.stein) / Number(building.kosten_stein))     : Infinity;
+        const maxEisen = Number(building.kosten_eisen)     > 0 ? Math.floor(Number(ressourcen.eisen) / Number(building.kosten_eisen))     : Infinity;
+        const maxStrom = Number(building.strom_verbrauch)  > 0 ? Math.floor(stromFrei               / Number(building.strom_verbrauch))  : Infinity;
+        const finite   = [maxGeld, maxStein, maxEisen, maxStrom].filter((v) => v !== Infinity);
         derzeit = finite.length > 0 ? Math.max(0, Math.min(...finite)) : 0;
       }
 
       /* Beschreibung dynamisch aus Datenbankfeldern erzeugen */
-      const bewohner = Number(building.bewohner || 0);
-      const miete = Number(building.einkommen_geld || 0);
-      const prodStein = Number(building.produktion_stein || 0);
-      const prodEisen = Number(building.produktion_eisen || 0);
-      const prodTreibstoff = Number(building.produktion_treibstoff || 0);
-      const stromProduktion = Number(building.strom_produktion || 0);
-      let descLines = '';
+      const bewohner        = Number(building.bewohner          || 0);
+      const miete           = Number(building.einkommen_geld    || 0);
+      const prodStein       = Number(building.produktion_stein   || 0);
+      const prodEisen       = Number(building.produktion_eisen   || 0);
+      const prodTreibstoff  = Number(building.produktion_treibstoff || 0);
+      const stromProduktion = Number(building.strom_produktion   || 0);
+
+      let descLines = "";
       if (building.beschreibung) {
         descLines += `<p class="bau-desc-line">${escapeHtml(building.beschreibung)}</p>`;
       }
@@ -269,13 +219,15 @@ async function loadBuildingTypes() {
     .join("");
 }
 
-/* Tab-Switching für Bauzentrum */
+/* Tab-Wechsel im Bauzentrum */
 document.addEventListener("click", async (e) => {
   if (!e.target.classList.contains("bau-tab")) return;
-  document.querySelectorAll(".bau-tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".bau-tab").forEach((t) => t.classList.remove("active"));
   e.target.classList.add("active");
   await loadBuildingTypes();
 });
+
+/* ── Gebäude bauen ─────────────────────────────────────────── */
 
 async function buildBuilding(gebaeudeTypId) {
   const message = document.getElementById("message");
@@ -289,16 +241,15 @@ async function buildBuilding(gebaeudeTypId) {
   }
 }
 
+/* ── Initialisierung ───────────────────────────────────────── */
+
 loadDashboard();
 
-/* Logout */
+/* Logout-Button */
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async () => {
-    await fetch("/api/logout", {
-      method: "POST"
-    });
-
+    await fetch("/api/logout", { method: "POST" });
     window.location.href = "/login.html";
   });
 }

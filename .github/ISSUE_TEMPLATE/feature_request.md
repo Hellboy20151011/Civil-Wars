@@ -6,19 +6,19 @@ labels: enhancement
 
 ## Short description
 <!-- What do you want to add or change? Keep it to 1–2 sentences. -->
--
+<!-- Enter your description here -->
 
 ## Why / Motivation
 <!-- Why is this useful? What problem does it solve or what does it improve? -->
--
+<!-- Explain the motivation here -->
 
 ## Details / Requirements
 <!-- Describe what exactly should happen. Be as specific as you can. -->
--
+<!-- Describe the requirements here -->
 
 <!-- Edge cases: are there situations where this feature could behave unexpectedly? -->
 **Edge cases:**
--
+<!-- List any edge cases here -->
 
 ## Acceptance criteria / Definition of Done
 <!-- Check off each item when it is met. -->
@@ -36,4 +36,4 @@ labels: enhancement
 
 ## Screenshots / Mockups (optional)
 <!-- Add screenshots, sketches, or mockups here if helpful. -->
--
+<!-- Add screenshots or mockups here -->

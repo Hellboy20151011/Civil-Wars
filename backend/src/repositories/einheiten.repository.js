@@ -19,11 +19,12 @@ async function findSpielerEinheiten(spielerId, client = pool) {
         et.kosten_stein,
         et.kosten_eisen,
         et.reisezeit_minuten,
+        et.fabrik_typ,
         COALESCE(se.anzahl, 0) AS anzahl
      FROM einheiten_typen et
      LEFT JOIN spieler_einheiten se
            ON se.einheit_typ_id = et.id AND se.spieler_id = $1
-     ORDER BY et.kaserne_stufe_min, et.id`,
+     ORDER BY et.fabrik_typ, et.kaserne_stufe_min, et.id`,
     [spielerId]
   );
   return result.rows;

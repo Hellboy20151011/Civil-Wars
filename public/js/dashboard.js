@@ -174,6 +174,11 @@ async function loadBuildingTypes() {
         const finite   = [maxGeld, maxStein, maxEisen, maxStrom].filter((v) => v !== Infinity);
         derzeit = finite.length > 0 ? Math.max(0, Math.min(...finite)) : 0;
 
+        if (building.name === 'Kaserne') {
+          const maxDurchKaserne = Math.max(0, 1 - anzahlGebaut);
+          derzeit = Math.min(derzeit, maxDurchKaserne);
+        }
+
         if (building.name === 'Öl-Raffinerie') {
           const bohrturmGebaut = spielerGebaeude.find((g) => g.name === 'Bohrturm');
           const bohrturmAnzahl = bohrturmGebaut ? Number(bohrturmGebaut.anzahl) : 0;

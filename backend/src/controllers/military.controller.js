@@ -19,6 +19,7 @@ async function getStatus(req, res) {
 
     const kaserneStufe = await buildingRepo.findKaserneStufe(spielerId, client);
     const kaserneStufen = await buildingRepo.findKaserneStufen(client);
+    const fahrzeugfabrikAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Fahrzeugfabrik', client);
     const einheiten = await einheitenRepo.findSpielerEinheiten(spielerId, client);
     const ressourcen = await resourcesRepo.findBySpielerIdLocked(spielerId, client);
 
@@ -34,6 +35,7 @@ async function getStatus(req, res) {
       kaserneStufe,
       maxStufe: MAX_KASERNE_STUFE,
       nextUpgrade,
+      fahrzeugfabrikAnzahl,
       einheiten,
       ressourcen: {
         geld: Number(ressourcen.geld),
@@ -132,23 +134,32 @@ async function trainEinheit(req, res) {
     await client.query('BEGIN');
     await economyService.applyProductionTicks(spielerId, client);
 
-    const kaserneStufe = await buildingRepo.findKaserneStufe(spielerId, client);
-    if (kaserneStufe === 0) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({ message: 'Du hast noch keine Kaserne gebaut.' });
-    }
-
     const einheitTyp = await einheitenRepo.findEinheitTypById(einheitTypId, client);
     if (!einheitTyp) {
       await client.query('ROLLBACK');
       return res.status(404).json({ message: 'Einheitentyp nicht gefunden.' });
     }
 
-    if (kaserneStufe < Number(einheitTyp.kaserne_stufe_min)) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({
-        message: `Für ${einheitTyp.name} wird Kaserne Stufe ${einheitTyp.kaserne_stufe_min} benötigt. Aktuelle Stufe: ${kaserneStufe}.`,
-      });
+    const fabrikTyp = einheitTyp.fabrik_typ || 'Kaserne';
+
+    if (fabrikTyp === 'Kaserne') {
+      const kaserneStufe = await buildingRepo.findKaserneStufe(spielerId, client);
+      if (kaserneStufe === 0) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ message: 'Du hast noch keine Kaserne gebaut.' });
+      }
+      if (kaserneStufe < Number(einheitTyp.kaserne_stufe_min)) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          message: `Für ${einheitTyp.name} wird Kaserne Stufe ${einheitTyp.kaserne_stufe_min} benötigt. Aktuelle Stufe: ${kaserneStufe}.`,
+        });
+      }
+    } else if (fabrikTyp === 'Fahrzeugfabrik') {
+      const fahrzeugfabrikAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Fahrzeugfabrik', client);
+      if (fahrzeugfabrikAnzahl === 0) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ message: 'Du hast noch keine Fahrzeugfabrik gebaut.' });
+      }
     }
 
     const ressourcen = await resourcesRepo.findBySpielerIdLocked(spielerId, client);

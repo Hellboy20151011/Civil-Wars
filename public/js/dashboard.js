@@ -203,7 +203,7 @@ async function loadBuildingTypes() {
             <div class="bau-card-left">
               <div class="bau-card-section-title"><u>Beschreibung</u></div>
               <div class="bau-card-desc">${descLines}</div>
-              <div class="bau-card-bauzeit">Bauzeit &nbsp;&nbsp; --:--:-- h</div>
+              <div class="bau-card-bauzeit">Bauzeit &nbsp;&nbsp; ${building.bauzeit_minuten > 0 ? escapeHtml(String(building.bauzeit_minuten)) + ' Minuten' : '–'}</div>
             </div>
             <div class="bau-card-right">
               <div class="bau-card-section-title"><u>Kosten:</u></div>

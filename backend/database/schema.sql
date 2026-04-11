@@ -75,6 +75,18 @@ CREATE TABLE IF NOT EXISTS spieler_einheiten (
     PRIMARY KEY (spieler_id, einheit_typ_id)
 );
 
+CREATE TABLE IF NOT EXISTS bau_auftraege (
+    id SERIAL PRIMARY KEY,
+    spieler_id INTEGER NOT NULL REFERENCES spieler(id) ON DELETE CASCADE,
+    gebaeude_typ_id INTEGER NOT NULL REFERENCES gebaeude_typen(id) ON DELETE CASCADE,
+    anzahl INTEGER NOT NULL DEFAULT 1,
+    begonnen_am TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fertig_am TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS bau_auftraege_spieler_idx ON bau_auftraege (spieler_id);
+CREATE INDEX IF NOT EXISTS bau_auftraege_fertig_am_idx ON bau_auftraege (fertig_am);
+
 CREATE TABLE IF NOT EXISTS user_sessions (
     sid VARCHAR NOT NULL PRIMARY KEY,
     sess JSON NOT NULL,

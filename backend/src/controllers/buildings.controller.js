@@ -11,6 +11,23 @@ async function getTypes(req, res) {
   res.json(types);
 }
 
+async function getQueue(req, res) {
+  const spielerId = req.session.spieler.id;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await economyService.processFertigeBauauftraege(spielerId, client);
+    const queue = await buildingRepo.findBauauftraegeBySpielerId(spielerId, client);
+    await client.query('COMMIT');
+    res.json(queue);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 async function build(req, res) {
   const client = await pool.connect();
   try {
@@ -21,6 +38,9 @@ async function build(req, res) {
 
     /* Erst alte Produktion verrechnen */
     await economyService.applyProductionTicks(spielerId, client);
+
+    /* Fertige Bauaufträge verarbeiten */
+    await economyService.processFertigeBauauftraege(spielerId, client);
 
     const gebaeude = await buildingRepo.findTypById(gebaeudeTypId, client);
     if (!gebaeude) {
@@ -98,14 +118,26 @@ async function build(req, res) {
       client
     );
 
-    await buildingRepo.upsertSpielerGebaeude(spielerId, gebaeudeTypId, anzahl, client);
-
-    const statusNeu = await playerService.getSpielerStatus(spielerId, client);
-
-    await client.query('COMMIT');
-
     const label = anzahl > 1 ? `${anzahl}x ${gebaeude.name}` : gebaeude.name;
-    res.json({ message: `${label} erfolgreich gebaut`, status: statusNeu });
+
+    if (Number(gebaeude.bauzeit_minuten) > 0) {
+      const auftrag = await buildingRepo.createBauauftrag(spielerId, gebaeudeTypId, anzahl, gebaeude.bauzeit_minuten, client);
+
+      const statusNeu = await playerService.getSpielerStatus(spielerId, client);
+
+      await client.query('COMMIT');
+
+      const fertigAmStr = new Date(auftrag.fertig_am).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+      res.json({ message: `${label} wird gebaut (fertig um ${fertigAmStr})`, status: statusNeu });
+    } else {
+      await buildingRepo.upsertSpielerGebaeude(spielerId, gebaeudeTypId, anzahl, client);
+
+      const statusNeu = await playerService.getSpielerStatus(spielerId, client);
+
+      await client.query('COMMIT');
+
+      res.json({ message: `${label} erfolgreich gebaut`, status: statusNeu });
+    }
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;
@@ -114,4 +146,4 @@ async function build(req, res) {
   }
 }
 
-module.exports = { getTypes, build };
+module.exports = { getTypes, getQueue, build };

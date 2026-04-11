@@ -128,4 +128,12 @@ async function applyProductionTicks(spielerId, client) {
   };
 }
 
-module.exports = { getGebaeudeStatus, applyProductionTicks };
+async function processFertigeBauauftraege(spielerId, client) {
+  const fertige = await buildingRepo.findFertigeBauauftraege(spielerId, client);
+  for (const auftrag of fertige) {
+    await buildingRepo.upsertSpielerGebaeude(spielerId, auftrag.gebaeude_typ_id, auftrag.anzahl, client);
+    await buildingRepo.deleteBauauftrag(auftrag.id, client);
+  }
+}
+
+module.exports = { getGebaeudeStatus, applyProductionTicks, processFertigeBauauftraege };

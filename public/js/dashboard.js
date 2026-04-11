@@ -99,10 +99,77 @@ function renderStatus(data) {
 
   renderGebaeudeListe(data.gebaeude);
   updateMilitaerNav(data.gebaeude);
+  renderBauWarteschlange(data.bauauftraege || []);
 }
 
-/* ── Dashboard laden ───────────────────────────────────────── */
+/* ── Bauwarteschlange rendern ───────────────────────────────── */
 
+let _bauQueueTimers = [];
+const DASHBOARD_RELOAD_DELAY_MS = 1500;
+
+function formatCountdown(fertigAm) {
+  const diff = Math.max(0, new Date(fertigAm) - Date.now());
+  const totalSec = Math.floor(diff / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return `${h}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+  if (m > 0) return `${m}m ${String(s).padStart(2, '0')}s`;
+  return `${s}s`;
+}
+
+function clearBauQueueTimers() {
+  _bauQueueTimers.forEach(clearInterval);
+  _bauQueueTimers = [];
+}
+
+function renderBauWarteschlange(auftraege) {
+  const container = document.getElementById("bauWarteschlange");
+  if (!container) return;
+
+  clearBauQueueTimers();
+
+  if (!auftraege || auftraege.length === 0) {
+    container.innerHTML = '<span class="empty-state">Keine Gebäude in der Bauwarteschlange.</span>';
+    return;
+  }
+
+  try {
+    container.innerHTML = auftraege
+      .map((a) => {
+        const countdownId = `countdown-${a.id}`;
+        return `
+          <div class="gebaeude-item bau-queue-item">
+            <span class="gebaeude-name">${escapeHtml(a.gebaeude_name)}</span>
+            <span class="gebaeude-info">&times; ${escapeHtml(String(a.anzahl))}</span>
+            <span class="bau-queue-countdown" id="${countdownId}">⏳ ${formatCountdown(a.fertig_am)}</span>
+          </div>
+        `;
+      })
+      .join("");
+
+    /* start countdown ticks */
+    auftraege.forEach((a) => {
+      const el = document.getElementById(`countdown-${a.id}`);
+      if (!el) return;
+      const timer = setInterval(() => {
+        const remaining = new Date(a.fertig_am) - Date.now();
+        if (remaining <= 0) {
+          el.textContent = '✅ Fertig!';
+          clearInterval(timer);
+          /* reload dashboard so completed buildings appear */
+          setTimeout(() => loadDashboard(), DASHBOARD_RELOAD_DELAY_MS);
+        } else {
+          el.textContent = `⏳ ${formatCountdown(a.fertig_am)}`;
+        }
+      }, 1000);
+      _bauQueueTimers.push(timer);
+    });
+  } catch (err) {
+    clearBauQueueTimers();
+    throw err;
+  }
+}
 async function loadDashboard() {
   const spielerName = document.getElementById("spielerName");
   if (!spielerName) return;

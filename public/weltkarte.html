@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Civil Wars – Militär</title>
+  <title>Civil Wars – Weltkarte</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="game-page">
@@ -15,45 +15,13 @@
       <div class="header-info">
         <span>Name: <span id="spielerName" class="header-val">-</span></span>
         <span>Koord.: <span class="header-val" id="spielerKoord">-:-</span></span>
-        <span>Wetter: <span class="header-val">-</span></span>
-        <span>Punkte: <span class="header-val" id="spielerPunkte">0 (#)</span></span>
       </div>
     </div>
-    <div class="header-tick" id="nextTickTimer">--:--</div>
+    <div class="header-tick"></div>
   </div>
 
-  <!-- Resource Bar -->
-  <div class="resource-bar">
-    <div class="res-item">
-      <span class="res-icon">💰</span>
-      <span id="geld">0</span>
-    </div>
-    <div class="res-separator"></div>
-    <div class="res-item">
-      <span class="res-icon">🪨</span>
-      <span id="stein">0</span>
-    </div>
-    <div class="res-separator"></div>
-    <div class="res-item">
-      <span class="res-icon">⚙️</span>
-      <span id="eisen">0</span>
-    </div>
-    <div class="res-separator"></div>
-    <div class="res-item">
-      <span class="res-icon">⛽</span>
-      <span id="treibstoff">0</span>
-    </div>
-    <div class="res-separator"></div>
-    <div class="res-item">
-      <span class="res-icon">⚡</span>
-      <span id="stromFrei">0</span>
-    </div>
-    <div class="res-separator"></div>
-    <div class="res-item">
-      <span class="res-icon">👥</span>
-      <span id="bewohner">0</span>
-    </div>
-  </div>
+  <!-- Resource Bar (leer auf dieser Seite) -->
+  <div class="resource-bar"></div>
 
   <!-- Main Game Layout: Nav | Content | Sidebar -->
   <div class="game-layout">
@@ -64,7 +32,7 @@
         <a href="dashboard.html" class="nav-link">Übersicht</a>
         <a href="bauzentrum.html" class="nav-link">Bauzentrum</a>
         <a href="#" class="nav-link">Union</a>
-        <a href="militaer.html" class="nav-link active" id="navMilitaer">Militär</a>
+        <a href="militaer.html" class="nav-link">Militär</a>
         <a href="#" class="nav-link nav-italic">Geheimdienst</a>
         <a href="#" class="nav-link nav-italic">Forschung</a>
         <a href="#" class="nav-link nav-italic">Handelszentrum</a>
@@ -75,7 +43,7 @@
       </div>
       <div class="nav-group">
         <a href="#" class="nav-link">Highscore</a>
-        <a href="weltkarte.html" class="nav-link">Weltkarte</a>
+        <a href="weltkarte.html" class="nav-link active">Weltkarte</a>
         <a href="#" class="nav-link">Suche</a>
         <a href="#" class="nav-link">✉ Nachrichten</a>
         <a href="#" class="nav-link">Profil</a>
@@ -90,24 +58,46 @@
     <!-- Main Content -->
     <main class="game-main">
 
-      <!-- Kaserne Status Panel -->
-      <div class="game-panel" id="kasernePanel">
-        <div class="game-panel-header">Kaserne</div>
-        <div class="game-panel-body" id="kaserneStatus">
-          <p class="empty-state">Lade Militärstatus …</p>
+      <!-- Weltkarte Panel -->
+      <div class="game-panel">
+        <div class="game-panel-header">🌍 Weltkarte (999 × 999 Felder)</div>
+        <div class="game-panel-body">
+          <p class="weltkarte-legende">
+            <span class="legende-eigener">●</span> Eigene Position &nbsp;
+            <span class="legende-andere">●</span> Andere Spieler
+          </p>
+          <div class="weltkarte-canvas-wrapper">
+            <canvas id="weltkarteCanvas" width="700" height="500" class="weltkarte-canvas"></canvas>
+          </div>
+          <div class="message" id="karteMessage"></div>
         </div>
       </div>
 
-      <!-- Einheiten ausbilden Panel -->
-      <div class="game-panel" id="einheitenPanel">
-        <div class="game-panel-header">Ausbilden / Produzieren</div>
-        <div class="bau-tabs" id="fabrikTabs"></div>
-        <div class="game-panel-body" id="einheitenListe">
-          <p class="empty-state">Lade Einheitenübersicht …</p>
+      <!-- Spielerliste mit Entfernungen -->
+      <div class="game-panel">
+        <div class="game-panel-header">Spieler &amp; Entfernungen</div>
+        <div class="game-panel-body">
+          <p class="weltkarte-hinweis">
+            Die Reisezeit beim Angriff berechnet sich aus der Entfernung:
+            <strong>1 Feld = 1 Minute</strong> Reisezeit.
+          </p>
+          <table class="data-table weltkarte-tabelle">
+            <thead>
+              <tr>
+                <th>Spieler</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Entfernung</th>
+                <th>Reisezeit</th>
+              </tr>
+            </thead>
+            <tbody id="spielerTabelle">
+              <tr><td colspan="5" class="empty-state">Lade Spieler...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div class="message" id="message"></div>
     </main>
 
     <!-- Right Sidebar -->
@@ -117,17 +107,11 @@
         <p class="premium-desc">Werde Premium-Mitglied und erhalte zusätzliche Vorteile!</p>
         <button class="btn-premium">Mehr Infos</button>
       </div>
-      <div class="sidebar-box buddy-box">
-        <div class="buddy-title">Buddyliste <span class="buddy-icon">↑</span></div>
-        <p class="empty-state-sm">Keine Spieler in der Buddyliste.</p>
-        <button class="btn-buddy">Spieler hinzufügen</button>
-      </div>
     </aside>
 
   </div>
 
   <script src="js/utils.js"></script>
-  <script src="js/dashboard.js"></script>
-  <script src="js/militaer.js"></script>
+  <script src="js/weltkarte.js"></script>
 </body>
 </html>

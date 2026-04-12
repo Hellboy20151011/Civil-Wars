@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth.routes');
 const meRoutes = require('./routes/me.routes');
 const buildingsRoutes = require('./routes/buildings.routes');
 const militaryRoutes = require('./routes/military.routes');
+const weltkarteRoutes = require('./routes/weltkarte.routes');
 const { errorHandler } = require('./middleware/errorHandler');
 
 function createApp() {
@@ -43,6 +44,7 @@ function createApp() {
   app.use('/api/me', meRoutes);
   app.use('/api/buildings', buildingsRoutes);
   app.use('/api/military', militaryRoutes);
+  app.use('/api/weltkarte', weltkarteRoutes);
 
   /* Central error handler – must be last */
   app.use(errorHandler);

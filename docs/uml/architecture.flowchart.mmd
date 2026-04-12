@@ -1,0 +1,10 @@
+graph TD;
+  Browser --> Frontend;
+  Frontend --> Express App;
+  Express App --> Routes;
+  Routes --> Controllers;
+  Controllers --> Services;
+  Services --> Repositories;
+  Repositories --> PostgreSQL;
+  UserSessions --> session store;
+  Express App --> Middleware;

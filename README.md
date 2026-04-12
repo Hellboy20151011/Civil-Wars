@@ -1,53 +1,44 @@
-🛡️ Civil-Wars
+# 🛡️ Civil-Wars
 
 Civil-Wars ist ein browserbasiertes Strategiespiel, in dem Spieler ihre eigene Basis aufbauen, Ressourcen verwalten und strategisch gegen andere Spieler antreten.
 
-🎮 Spielprinzip
+## 🎮 Spielprinzip
 
 Der Spieler startet mit einer kleinen Basis und entwickelt diese Schritt für Schritt weiter:
 
-🏗️ Basisaufbau
-Errichte Gebäude, erweitere deine Infrastruktur und optimiere deine Produktion.
-⚙️ Ressourcenmanagement
-Verwalte wichtige Ressourcen wie:
-Geld
-Stein
-Eisen
-Strom
-Treibstoff
-📈 Wachstum durch Expansion
-Mehr Gebäude bedeuten höhere Einnahmen – aber auch steigende Kosten.
-Eine effiziente Balance ist entscheidend für langfristigen Erfolg.
-⚔️ Kampfsystem
+- 🏗️ **Basisaufbau** – Errichte Gebäude, erweitere deine Infrastruktur und optimiere deine Produktion.
+- ⚙️ **Ressourcenmanagement** – Verwalte wichtige Ressourcen wie Geld, Stein, Eisen, Strom und Treibstoff.
+- 📈 **Wachstum durch Expansion** – Mehr Gebäude bedeuten höhere Einnahmen, aber auch steigende Kosten. Eine effiziente Balance ist entscheidend.
+
+## ⚔️ Kampfsystem
 
 Sobald deine Basis stark genug ist, kannst du andere Spieler angreifen:
 
-Plane strategische Angriffe
-Nutze deine militärischen Gebäude zur Truppenproduktion
-Gewinne Kämpfe, um deine Macht auszubauen
+- Plane strategische Angriffe
+- Nutze deine militärischen Gebäude zur Truppenproduktion
+- Gewinne Kämpfe, um deine Macht auszubauen
 
-🏴‍☠️ Belohnungssystem:
+🏴‍☠️ **Belohnungssystem:** Besiegte Gegner verlieren einen Teil ihrer Gebäude, den du übernehmen kannst.
 
-Besiegte Gegner verlieren einen Teil ihrer Gebäude, den du übernehmen kannst.
+## 🧠 Strategie im Fokus
 
-🧠 Strategie im Fokus
+Civil-Wars kombiniert langfristige Planung, wirtschaftliches Denken und taktische Entscheidungen im Kampf. Jede Entscheidung beeinflusst deinen Fortschritt und deine Dominanz im Spiel.
 
-Civil-Wars kombiniert:
+## 🛠️ Features (aktuell / geplant)
 
-langfristige Planung
-wirtschaftliches Denken
-taktische Entscheidungen im Kampf
+| Feature | Status |
+|---|---|
+| Registrierung & Login | ✅ Fertig |
+| Ressourcen-System | ✅ Fertig |
+| Gebäudeverwaltung (Bauzentrum) | ✅ Fertig |
+| Militär – Kaserne & Einheiten ausbilden | ✅ Fertig |
+| Militär – Fahrzeuge produzieren | ⚠️ Backend vorhanden, Balance fehlt noch |
+| Weltkarte (Spieler-Übersicht) | ⚠️ Grundansicht vorhanden, kein Angriff über Karte |
+| Kampfsystem (PvP-Angriffe) | 🔄 In Entwicklung |
+| Multiplayer-Interaktionen | 🔄 Geplant |
+| CI/CD-Pipeline (GitHub Actions) | ✅ Fertig |
 
-Jede Entscheidung beeinflusst deinen Fortschritt und deine Dominanz im Spiel.
-
-🛠️ Features (aktuell / geplant)
-✅ Registrierung & Login
-✅ Ressourcen-System
-✅ Gebäudeverwaltung
-🔄 Kampfsystem (in Entwicklung)
-🔄 Multiplayer-Interaktionen
-🔄 Karten-/Weltsystem
-🚀 Ziel des Projekts
+## 🚀 Ziel des Projekts
 
 Ein tiefgehendes, langfristig motivierendes Browsergame zu entwickeln, das klassische Aufbaustrategie mit kompetitiven PvP-Elementen verbindet.
 
@@ -57,6 +48,11 @@ Ein tiefgehendes, langfristig motivierendes Browsergame zu entwickeln, das klass
 
 ```
 Civil-Wars/
+├── .github/
+│   ├── ISSUE_TEMPLATE/       # Issue-Vorlagen (Bug, Feature, Gebäude, Einheit …)
+│   ├── workflows/
+│   │   └── ci.yml            # GitHub Actions CI-Pipeline
+│   └── pull_request_template.md
 ├── backend/                  # Node.js / Express Server
 │   ├── database/             # Datenbankskripte
 │   │   └── schema.sql        # Vollständiges Datenbankschema (Tabellen + Seed-Daten)
@@ -69,7 +65,9 @@ Civil-Wars/
 │   │   ├── controllers/      # HTTP-Request-Handler (thin layer)
 │   │   │   ├── auth.controller.js
 │   │   │   ├── buildings.controller.js
-│   │   │   └── me.controller.js
+│   │   │   ├── me.controller.js
+│   │   │   ├── military.controller.js
+│   │   │   └── weltkarte.controller.js
 │   │   ├── middleware/       # Express-Middleware
 │   │   │   ├── asyncWrapper.js   # Async-Fehlerweiterleitung
 │   │   │   ├── auth.js           # Authentifizierungsprüfung
@@ -84,23 +82,32 @@ Civil-Wars/
 │   │   ├── routes/           # Express-Routen-Definitionen
 │   │   │   ├── auth.routes.js
 │   │   │   ├── buildings.routes.js
-│   │   │   └── me.routes.js
+│   │   │   ├── me.routes.js
+│   │   │   ├── military.routes.js
+│   │   │   └── weltkarte.routes.js
 │   │   └── services/         # Geschäftslogik
 │   │       ├── economy.service.js   # Tick-Produktion, Strom, Einnahmen
 │   │       └── player.service.js    # Spielerstatus aggregieren
 │   ├── .env.example          # Vorlage für Umgebungsvariablen
 │   └── package.json
-└── public/                   # Statisches Frontend (HTML / CSS / JS)
-    ├── index.html            # Startseite
-    ├── login.html            # Login-Seite
-    ├── register.html         # Registrierungsseite
-    ├── dashboard.html        # Spieler-Dashboard
-    ├── bauzentrum.html       # Bauzentrum
-    ├── style.css             # Globales Stylesheet
-    └── js/                   # Frontend-JavaScript (modular)
-        ├── utils.js          # Hilfsfunktionen (escapeHtml, setEl, postData)
-        ├── auth.js           # Login- und Registrierungslogik
-        └── dashboard.js      # Dashboard, Gebäudeverwaltung, Logout
+├── public/                   # Statisches Frontend (HTML / CSS / JS)
+│   ├── index.html            # Startseite
+│   ├── login.html            # Login-Seite
+│   ├── register.html         # Registrierungsseite
+│   ├── dashboard.html        # Spieler-Dashboard
+│   ├── bauzentrum.html       # Bauzentrum
+│   ├── militaer.html         # Militärseite (Kaserne, Einheiten, Fahrzeuge)
+│   ├── weltkarte.html        # Weltkarte (Spieler-Übersicht auf Koordinatengitter)
+│   ├── style.css             # Globales Stylesheet
+│   └── js/                   # Frontend-JavaScript (modular)
+│       ├── utils.js          # Hilfsfunktionen (escapeHtml, setEl, postData)
+│       ├── auth.js           # Login- und Registrierungslogik
+│       ├── dashboard.js      # Dashboard, Gebäudeverwaltung, Logout
+│       ├── militaer.js       # Militärseite: Kaserne, Einheiten, Fahrzeuge
+│       └── weltkarte.js      # Weltkarte: Spieler auf Koordinatengitter anzeigen
+├── CONTRIBUTING.md           # Hinweise für Mitwirkende
+├── NEXT_STEPS.md             # Nächste Entwicklungsschritte
+└── README.md                 # Projektbeschreibung und Schnellstart
 ```
 
 ### Architektur-Überblick (Backend)

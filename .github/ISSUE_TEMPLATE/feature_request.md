@@ -1,39 +1,39 @@
 ---
-name: Feature request
-about: Suggest a new feature or improvement for the game or codebase
+name: Feature vorschlagen
+about: Schlage ein neues Feature oder eine Verbesserung für das Spiel oder den Code vor
 labels: enhancement
 ---
 
-## Short description
-<!-- What do you want to add or change? Keep it to 1–2 sentences. -->
-<!-- Enter your description here -->
+## Kurzbeschreibung
+<!-- Was möchtest du hinzufügen oder ändern? Möglichst in 1–2 Sätzen. -->
+<!-- Beschreibung hier eintragen -->
 
-## Why / Motivation
-<!-- Why is this useful? What problem does it solve or what does it improve? -->
-<!-- Explain the motivation here -->
+## Warum / Motivation
+<!-- Warum ist das sinnvoll? Welches Problem löst es oder was verbessert es? -->
+<!-- Begründung hier eintragen -->
 
-## Details / Requirements
-<!-- Describe what exactly should happen. Be as specific as you can. -->
-<!-- Describe the requirements here -->
+## Details / Anforderungen
+<!-- Beschreibe genau, was passieren soll. Je konkreter, desto besser. -->
+<!-- Anforderungen hier beschreiben -->
 
-<!-- Edge cases: are there situations where this feature could behave unexpectedly? -->
-**Edge cases:**
-<!-- List any edge cases here -->
+**Edge Cases:**
+<!-- Gibt es Situationen, in denen sich das Feature unerwartet verhalten könnte? -->
+<!-- Edge Cases hier auflisten -->
 
-## Acceptance criteria / Definition of Done
-<!-- Check off each item when it is met. -->
-- [ ] The feature is implemented and works as described above.
-- [ ] The code follows the project structure (Backend / Database / Frontend separated).
-- [ ] The UI is clear and beginner-friendly (if frontend is involved).
-- [ ] **Game mechanics have not been unintentionally simplified or weakened** (only relevant if gameplay is affected).
-- [ ] The change has been manually tested (see smoke-test steps below).
+## Akzeptanzkriterien / Definition of Done
+<!-- Hake die Punkte ab, wenn sie erfüllt sind. -->
+- [ ] Das Feature ist implementiert und funktioniert wie oben beschrieben.
+- [ ] Der Code folgt der Projektstruktur (Backend / Datenbank / Frontend getrennt).
+- [ ] Die UI ist klar und anfängerfreundlich (falls Frontend betroffen).
+- [ ] **Die Spielmechanik wurde nicht unbeabsichtigt vereinfacht oder geschwächt** (nur relevant, wenn Gameplay betroffen).
+- [ ] Die Änderung wurde manuell getestet (siehe Smoke-Test-Schritte unten).
 
-## Test / Smoke test steps
-<!-- How can someone quickly verify this feature works? List the steps. -->
+## Test / Smoke-Test-Schritte
+<!-- Wie kann jemand schnell prüfen, ob das Feature funktioniert? Schritte auflisten. -->
 1.
 2.
 3.
 
 ## Screenshots / Mockups (optional)
-<!-- Add screenshots, sketches, or mockups here if helpful. -->
-<!-- Add screenshots or mockups here -->
+<!-- Screenshots, Skizzen oder Mockups hier einfügen, falls hilfreich. -->
+<!-- Screenshots oder Mockups hier -->

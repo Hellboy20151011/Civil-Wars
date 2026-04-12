@@ -16,6 +16,8 @@ Dieses Dokument beschreibt die nächsten sinnvollen Entwicklungsschritte für da
 | Militär – Kaserne-Upgrades | ✅ Fertig |
 | Militär – Infanterie ausbilden | ✅ Fertig |
 | Militär – Fahrzeuge produzieren (Fahrzeugfabrik) | ⚠️ Backend-Logik vorhanden, aber Kosten & Balance fehlen noch |
+| Koordinatensystem & Weltkarte | ⚠️ Grundansicht vorhanden, Angriff über Karte fehlt noch |
+| CI/CD-Pipeline (GitHub Actions) | ✅ Fertig |
 
 ---
 
@@ -46,14 +48,13 @@ Dieses Dokument beschreibt die nächsten sinnvollen Entwicklungsschritte für da
 
 ---
 
-### 3. 🌍 Koordinatensystem & Weltkarte
+### 3. ✅ 🌍 Koordinatensystem & Weltkarte
 
-**Warum jetzt?** Die Spalten `koordinate_x` und `koordinate_y` existieren bereits in der `spieler`-Tabelle, werden aber noch nicht genutzt.
+**Status:** Grundimplementierung fertig. Die Weltkarte (`weltkarte.html`) zeigt alle Spieler mit ihren Koordinaten auf einem Gitter. Koordinaten werden beim Registrieren automatisch vergeben.
 
-**Was zu tun ist:**
-- Koordinaten beim Registrieren eines neuen Spielers automatisch vergeben
-- Neue Seite `weltkarte.html` erstellen, die eine einfache Gitter-Karte der Spieler zeigt
+**Noch offen:**
 - Entfernung zwischen Spielern berechnen, um Reisezeit beim Angriff zu bestimmen
+- Angriff direkt über die Weltkarte starten (hängt von Schritt 2 ab)
 
 ---
 
@@ -181,14 +182,12 @@ Dieses Dokument beschreibt die nächsten sinnvollen Entwicklungsschritte für da
 
 ---
 
-### 15. 🔁 CI/CD-Pipeline einrichten
+### 15. ✅ 🔁 CI/CD-Pipeline einrichten
 
-**Warum?** Automatisiertes Testen und Deployen spart Zeit und verhindert Fehler.
+**Status:** Fertig. Die GitHub Actions Workflow-Datei `.github/workflows/ci.yml` ist vorhanden und führt bei jedem Push auf `main` und bei jedem Pull Request automatisch `npm ci`, Lint und Tests aus.
 
-**Was zu tun ist:**
-- GitHub Actions Workflow anlegen (`.github/workflows/ci.yml`)
-- `npm install && npm test` bei jedem Push/PR ausführen
-- Optional: Automatisches Deployment auf einen Server (z. B. Railway, Render, oder eigener VPS)
+**Optional für die Zukunft:**
+- Automatisches Deployment auf einen Server (z. B. Railway, Render, oder eigener VPS) einrichten
 
 ---
 
@@ -204,4 +203,4 @@ Diese Änderungen sind klein, verbessern aber sofort die Spielerfahrung:
 
 ---
 
-> Zuletzt aktualisiert: April 2026
+> Zuletzt aktualisiert: April 2026 (Weltkarte & CI/CD als erledigt markiert)

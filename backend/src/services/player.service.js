@@ -42,6 +42,7 @@ async function getSpielerStatus(spielerId, client) {
     ticksVerrechnet: tickStatus.ticks,
     tickDauerSekunden: config.tickDurationSeconds,
     letzteAktualisierung: tickStatus.letzteAktualisierung,
+    serverNow: new Date().toISOString(),
   };
 }
 

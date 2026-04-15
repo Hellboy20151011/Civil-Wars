@@ -10,12 +10,16 @@ const pool = require('../db');
 const playerService = require('../services/player.service');
 
 async function me(req, res) {
+  res.locals.serverNow = new Date().toISOString();
   const client = await pool.connect();
   try {
     // Transaktion schützt vor inkonsistentem Zwischenstand bei Tick- und Auftragsverarbeitung.
     await client.query('BEGIN');
     const status = await playerService.getSpielerStatus(req.session.spieler.id, client);
     await client.query('COMMIT');
+    if (!status.serverNow) {
+      status.serverNow = res.locals.serverNow;
+    }
     res.json(status);
   } catch (error) {
     await client.query('ROLLBACK');

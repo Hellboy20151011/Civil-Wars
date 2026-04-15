@@ -33,7 +33,7 @@
   → Not imported anywhere (wird in keiner HTML-Datei per `<script>` eingebunden). Funktional durch `public/js/pages/militaer.page.js` + `public/js/render/militaerView.js` ersetzt.
 
 * `backend/src/repositories/einheiten.repository.js:10-14`
-  → `findAllEinheitenTypen` ist exportiert, aber im Repository aktuell ohne Aufrufer.
+  → `findAllEinheitenTypen` ist exportiert, wird im Repository aber nirgendwo aufgerufen.
 
 ---
 
@@ -56,7 +56,7 @@
 ## ⚡ Performance Issues
 
 * `backend/src/services/economy.service.js:143-145`
-  → Problem: Für jeden fertigen Bauauftrag werden 2 DB-Queries in einer Schleife ausgeführt (`upsert` + `delete`) ⇒ N+1-Muster bei großen Queues.
+  → Problem: Für jeden fertigen Bauauftrag werden 2 DB-Queries in einer Schleife ausgeführt (`upsert` + `delete`), was bei großen Queues zu einem N+1-Muster führt.
   → Fix: Batch-Verarbeitung (z. B. `DELETE ... RETURNING` + gruppiertes `UPSERT`) in wenigen Queries.
 
 * `backend/src/controllers/military.controller.js:27,35-38`

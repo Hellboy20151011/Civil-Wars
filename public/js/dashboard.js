@@ -1,6 +1,11 @@
 /**
  * dashboard.js – Dashboard, Gebäudeverwaltung & Logout
  * Benötigt: utils.js (escapeHtml, setEl, postData)
+ * API-Verknüpfung:
+ * - GET /api/me -> me.routes -> me.controller -> player.service
+ * - GET /api/buildings/types -> buildings.routes -> buildings.controller.getTypes
+ * - POST /api/buildings/build -> buildings.routes -> buildings.controller.build
+ * - POST /api/logout -> auth.routes -> auth.controller.logout
  */
 
 /* ── Militär-Navigationslink aktualisieren ─────────────────── */
@@ -185,6 +190,7 @@ async function loadDashboard() {
   const spielerName = document.getElementById("spielerName");
   if (!spielerName) return;
 
+  // Lädt den aggregierten Spielerstatus vom Backend.
   const response = await fetch("/api/me");
 
   if (!response.ok) {
@@ -205,6 +211,7 @@ async function loadBuildingTypes() {
   const container = document.getElementById("buildingTypes");
   if (!container) return;
 
+  // Lädt Gebäudestammdaten für die aktive Bauzentrum-Kategorie.
   const response = await fetch("/api/buildings/types");
 
   if (!response.ok) {
@@ -364,6 +371,7 @@ async function buildBuilding(gebaeudeTypId) {
   const input = document.getElementById(`anzahl-${gebaeudeTypId}`);
   const anzahl = input ? Math.max(1, parseInt(input.value, 10) || 1) : 1;
 
+  // Startet im Backend entweder Sofort-Bau oder Warteschlangen-Auftrag.
   const result = await postData("/api/buildings/build", { gebaeudeTypId, anzahl });
   if (message) message.textContent = result.message;
 

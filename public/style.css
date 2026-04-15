@@ -1,3 +1,9 @@
+/* 
+ * style.css:
+ * Zentrales Stylesheet für Login/Registrierung und die Spieloberfläche
+ * (Dashboard, Bauzentrum, Militär, Weltkarte).
+ */
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;

@@ -1,10 +1,17 @@
 'use strict';
 
+/*
+ * Economy-Service:
+ * Bündelt Wirtschaftslogik (Produktion, Strom, Tick-Verrechnung, Bauauftrag-Abschluss).
+ * Wird von mehreren Controllern und vom player.service genutzt.
+ */
+
 const config = require('../config');
 const buildingRepo = require('../repositories/building.repository');
 const resourcesRepo = require('../repositories/resources.repository');
 
 async function getGebaeudeStatus(spielerId, client) {
+  // Liefert aggregierte Produktionswerte aus allen Gebäuden eines Spielers.
   const gebaeude = await buildingRepo.findBySpieler(spielerId, client);
 
   let stromProduktion = 0;
@@ -33,7 +40,7 @@ async function getGebaeudeStatus(spielerId, client) {
     }
   }
 
-  /* Jeder Bewohner zahlt 1 € Steuern pro Tick */
+  // Steuerbasis: Bewohner tragen einen festen Betrag pro Tick bei.
   steuerBasisBewohner = 10 * gesamtBewohner;
   const produktionGeld = mieteinnahmen + steuerBasisBewohner + einnahmenSonstige;
 
@@ -61,6 +68,7 @@ async function getGebaeudeStatus(spielerId, client) {
 }
 
 async function applyProductionTicks(spielerId, client) {
+  // Ressourcenzeile wird gesperrt gelesen, damit parallele Requests konsistent bleiben.
   const ressourcen = await resourcesRepo.findBySpielerIdLocked(spielerId, client);
 
   if (!ressourcen) {
@@ -69,6 +77,7 @@ async function applyProductionTicks(spielerId, client) {
 
   const gebaeudeStatus = await getGebaeudeStatus(spielerId, client);
 
+  // Nur vollständig vergangene Ticks werden verrechnet.
   const letzteAktualisierung = new Date(ressourcen.letzte_aktualisierung);
   const jetzt = new Date();
   const vergangeneSekunden = Math.floor((jetzt - letzteAktualisierung) / 1000);
@@ -129,6 +138,7 @@ async function applyProductionTicks(spielerId, client) {
 }
 
 async function processFertigeBauauftraege(spielerId, client) {
+  // Fertige Bauaufträge werden in Gebäude umgewandelt und danach aus der Queue gelöscht.
   const fertige = await buildingRepo.findFertigeBauauftraege(spielerId, client);
   for (const auftrag of fertige) {
     await buildingRepo.upsertSpielerGebaeude(spielerId, auftrag.gebaeude_typ_id, auftrag.anzahl, client);

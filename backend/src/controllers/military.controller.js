@@ -1,5 +1,11 @@
 'use strict';
 
+/*
+ * Military-Controller:
+ * Verarbeitet Militärstatus, Kaserne-Upgrades und Einheitenausbildung.
+ * Die eigentliche Datenhaltung läuft über Repositories; Tick-Berechnung über economy.service.
+ */
+
 const pool = require('../db');
 const buildingRepo = require('../repositories/building.repository');
 const resourcesRepo = require('../repositories/resources.repository');
@@ -9,7 +15,7 @@ const playerService = require('../services/player.service');
 
 const MAX_KASERNE_STUFE = 4;
 
-/* GET /api/military/status */
+// GET /api/military/status: Liefert Kaserne, verfügbare Fabriken, Einheiten und Ressourcen.
 async function getStatus(req, res) {
   const spielerId = req.session.spieler.id;
   const client = await pool.connect();
@@ -25,7 +31,7 @@ async function getStatus(req, res) {
 
     await client.query('COMMIT');
 
-    /* Next upgrade info */
+    // Nächste Upgrade-Stufe inklusive Kosten für das Frontend vorbereiten.
     const nextStufe = kaserneStufe < MAX_KASERNE_STUFE ? kaserneStufe + 1 : null;
     const nextUpgrade = nextStufe
       ? kaserneStufen.find((s) => Number(s.stufe) === nextStufe) || null
@@ -51,7 +57,7 @@ async function getStatus(req, res) {
   }
 }
 
-/* POST /api/military/upgrade */
+// POST /api/military/upgrade: Prüft Regeln/Kosten und erhöht die Kaserne-Stufe um 1.
 async function upgradeKaserne(req, res) {
   const spielerId = req.session.spieler.id;
   const client = await pool.connect();
@@ -102,7 +108,7 @@ async function upgradeKaserne(req, res) {
       Number(upgradeKosten.kosten_geld),
       Number(upgradeKosten.kosten_stein),
       Number(upgradeKosten.kosten_eisen),
-      0, /* Kaserne-Upgrades kosten keinen Treibstoff */
+      0, // Kaserne-Upgrades kosten keinen Treibstoff.
       client
     );
 
@@ -124,7 +130,7 @@ async function upgradeKaserne(req, res) {
   }
 }
 
-/* POST /api/military/train */
+// POST /api/military/train: Bildet Einheiten aus und bucht Ressourcen ab.
 async function trainEinheit(req, res) {
   const spielerId = req.session.spieler.id;
   const { einheitTypId, anzahl = 1 } = req.body;
@@ -140,6 +146,7 @@ async function trainEinheit(req, res) {
       return res.status(404).json({ message: 'Einheitentyp nicht gefunden.' });
     }
 
+    // Einheit bestimmt, ob Kaserne oder Fahrzeugfabrik als Voraussetzung gilt.
     const fabrikTyp = einheitTyp.fabrik_typ || 'Kaserne';
 
     if (fabrikTyp === 'Kaserne') {
@@ -185,7 +192,7 @@ async function trainEinheit(req, res) {
       return res.status(400).json({ message: 'Zu wenig Eisen.' });
     }
 
-    await resourcesRepo.deductResources(spielerId, gesamtGeld, gesamtStein, gesamtEisen, 0 /* kein Treibstoff */, client);
+    await resourcesRepo.deductResources(spielerId, gesamtGeld, gesamtStein, gesamtEisen, 0, client);
     await einheitenRepo.upsertSpielerEinheiten(spielerId, einheitTypId, anzahl, client);
 
     const statusNeu = await playerService.getSpielerStatus(spielerId, client);

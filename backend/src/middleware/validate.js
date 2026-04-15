@@ -1,9 +1,15 @@
 'use strict';
 
+/*
+ * Validierungs-Middleware:
+ * Bindet Zod-Schemata in Express ein und liefert bei fehlerhaften Nutzerdaten
+ * eine einheitliche 400-Antwort zurück.
+ */
+
 /**
- * Returns an Express middleware that validates req.body against a Zod schema.
- * On success, req.body is replaced with the parsed (coerced) data.
- * On failure, responds with 400 and the first validation error message.
+ * Gibt eine Middleware zurück, die req.body gegen ein Zod-Schema prüft.
+ * Bei Erfolg werden geparste Daten in req.body übernommen.
+ * Bei Fehlern wird mit Status 400 geantwortet.
  */
 function validateBody(schema) {
   return (req, res, next) => {

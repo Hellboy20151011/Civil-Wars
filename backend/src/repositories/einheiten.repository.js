@@ -1,13 +1,20 @@
 'use strict';
 
+/*
+ * Einheiten-Repository:
+ * Kapselt SQL-Zugriffe für Einheitentypen und den Einheitenbestand eines Spielers.
+ */
+
 const pool = require('../db');
 
 async function findAllEinheitenTypen(client = pool) {
+  // Stammdaten aller Einheitentypen laden.
   const result = await client.query('SELECT * FROM einheiten_typen ORDER BY kaserne_stufe_min, id');
   return result.rows;
 }
 
 async function findSpielerEinheiten(spielerId, client = pool) {
+  // Einheitentypen mit aktuellem Bestand des Spielers zusammenführen.
   const result = await client.query(
     `SELECT
         et.id,
@@ -31,6 +38,7 @@ async function findSpielerEinheiten(spielerId, client = pool) {
 }
 
 async function upsertSpielerEinheiten(spielerId, einheitTypId, anzahl, client = pool) {
+  // Bestand erhöhen oder neu anlegen.
   await client.query(
     `INSERT INTO spieler_einheiten (spieler_id, einheit_typ_id, anzahl)
      VALUES ($1, $2, $3)
@@ -41,6 +49,7 @@ async function upsertSpielerEinheiten(spielerId, einheitTypId, anzahl, client = 
 }
 
 async function findEinheitTypById(id, client = pool) {
+  // Einzelnen Einheitentyp für Trainingsprüfungen laden.
   const result = await client.query(
     'SELECT * FROM einheiten_typen WHERE id = $1',
     [id]

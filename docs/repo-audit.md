@@ -5,6 +5,7 @@
 * Score: 6.2/10
 * Critical Issues: 2
 * Warnings: 9
+* Bewertungslogik: Startwert 10, pro Critical -1.5 Punkte, pro Warning -0.1 Punkte.
 
 ---
 
@@ -40,11 +41,11 @@
 ## 🔐 Security Issues
 
 * `backend/src/config/index.js:25`
-  → Problem: Harte Fallback-Session-Secret (`civil-wars-super-secret`) erlaubt vorhersehbare Session-Signaturen, falls `SESSION_SECRET` in Entwicklungs- oder Staging-Umgebungen nicht gesetzt ist.
+  → Problem: Harte Fallback-Session-Secret mit vorhersagbarem Klartextwert erlaubt vorhersehbare Session-Signaturen, falls `SESSION_SECRET` in Entwicklungs- oder Staging-Umgebungen nicht gesetzt ist.
   → Fix: `SESSION_SECRET` in allen Umgebungen verpflichtend machen oder mindestens einen starken, zufälligen Startwert beim Boot erzwingen.
 
 * `backend/src/config/index.js:30`
-  → Problem: Hartes Default-DB-Passwort (`admin`) erhöht Risiko von Fehlkonfigurationen in geteilten/staging Umgebungen.
+  → Problem: Hartes Default-DB-Passwort mit schwachem, vorhersagbarem Klartextwert erhöht Risiko von Fehlkonfigurationen in geteilten/staging Umgebungen.
   → Fix: Kein Passwort-Fallback; bei fehlendem `DB_PASSWORD` den Start abbrechen (nicht nur in Production).
 
 * `backend/src/controllers/weltkarte.controller.js:11-13` + `backend/src/routes/weltkarte.routes.js:18`

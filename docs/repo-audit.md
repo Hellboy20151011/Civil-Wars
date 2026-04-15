@@ -40,7 +40,7 @@
 ## 🔐 Security Issues
 
 * `backend/src/config/index.js:25`
-  → Problem: Harte Fallback-Session-Secret (`civil-wars-super-secret`) erlaubt vorhersehbare Session-Signaturen, falls `SESSION_SECRET` in Non-Prod nicht gesetzt ist.
+  → Problem: Harte Fallback-Session-Secret (`civil-wars-super-secret`) erlaubt vorhersehbare Session-Signaturen, falls `SESSION_SECRET` in Entwicklungs- oder Staging-Umgebungen nicht gesetzt ist.
   → Fix: `SESSION_SECRET` in allen Umgebungen verpflichtend machen oder mindestens einen starken, zufälligen Startwert beim Boot erzwingen.
 
 * `backend/src/config/index.js:30`
@@ -56,7 +56,7 @@
 ## ⚡ Performance Issues
 
 * `backend/src/services/economy.service.js:143-145`
-  → Problem: Pro fertigem Bauauftrag werden 2 DB-Queries in einer Schleife ausgeführt (`upsert` + `delete`) ⇒ N+1-Muster bei großen Queues.
+  → Problem: Für jeden fertigen Bauauftrag werden 2 DB-Queries in einer Schleife ausgeführt (`upsert` + `delete`) ⇒ N+1-Muster bei großen Queues.
   → Fix: Batch-Verarbeitung (z. B. `DELETE ... RETURNING` + gruppiertes `UPSERT`) in wenigen Queries.
 
 * `backend/src/controllers/military.controller.js:27,35-38`
@@ -77,7 +77,7 @@
 
 * `README.md:103-107`
   → Problem: Dokumentation zeigt weiterhin die alten Frontend-Dateien (`dashboard.js`, `militaer.js`) als aktive Struktur, obwohl die HTML-Seiten bereits modulare Dateien laden.
-  → Fix: Projektstruktur im README an die tatsächlich eingebundene `core/`, `render/`, `pages/`-Struktur anpassen.
+  → Fix: Projektstruktur im README an die tatsächlich eingebundene `core/`, `render/`, `pages/`-Struktur anpassen (z. B. `public/js/core/api.js`, `public/js/render/dashboardView.js`, `public/js/pages/dashboard.page.js`).
 
 * `public/js/weltkarte.js:26-39`
   → Problem: Utility-Funktionen (`setEl`, `escapeHtml`) werden lokal dupliziert statt die bestehenden Helfer aus `utils.js` konsistent zu nutzen.

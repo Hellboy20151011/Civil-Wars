@@ -1,7 +1,7 @@
 (function initDashboardPage(global) {
   'use strict';
 
-  let refreshScheduled = false;
+  let isRefreshPending = false;
 
   function onSnapshot(snapshot) {
     global.SharedRenderer.renderShared(snapshot);
@@ -9,15 +9,15 @@
   }
 
   function onCountdownFinished() {
-    if (refreshScheduled) return;
-    refreshScheduled = true;
+    if (isRefreshPending) return;
+    isRefreshPending = true;
     setTimeout(async () => {
-      refreshScheduled = false;
+      isRefreshPending = false;
       await global.LiveState.refreshNow();
     }, 250);
   }
 
-  async function setupLogout() {
+  function setupLogout() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (!logoutBtn) return;
     logoutBtn.addEventListener('click', async () => {

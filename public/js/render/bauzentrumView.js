@@ -37,9 +37,10 @@
 
     const gebautEintrag = spielerGebaeude.find((g) => Number(g.id) === Number(building.id));
     const anzahlGebaut = gebautEintrag ? Number(gebautEintrag.anzahl) : 0;
+    const serverNowMs = global.CoreClock.getServerNowMs();
     const bereitsInQueue = aktiveQueue.some(
       (auftrag) => Number(auftrag.gebaeude_typ_id) === Number(building.id)
-        && new Date(auftrag.fertig_am).getTime() > global.CoreClock.getServerNowMs()
+        && new Date(auftrag.fertig_am).getTime() > serverNowMs
     );
 
     const maxGeld = Number(building.kosten_geld) > 0

@@ -1,7 +1,7 @@
 (function initBauzentrumPage(global) {
   'use strict';
 
-  let refreshScheduled = false;
+  let isRefreshPending = false;
 
   function onSnapshot(snapshot) {
     global.SharedRenderer.renderShared(snapshot);
@@ -9,10 +9,10 @@
   }
 
   function onCountdownFinished() {
-    if (refreshScheduled) return;
-    refreshScheduled = true;
+    if (isRefreshPending) return;
+    isRefreshPending = true;
     setTimeout(async () => {
-      refreshScheduled = false;
+      isRefreshPending = false;
       await global.LiveState.refreshNow();
     }, 250);
   }

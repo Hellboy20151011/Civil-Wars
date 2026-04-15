@@ -1,6 +1,10 @@
 /**
  * militaer.js – Militärseite: Kaserne-Status, Upgrade, Einheiten ausbilden
  * Benötigt: utils.js (escapeHtml, setEl, postData), dashboard.js (renderStatus, loadDashboard)
+ * API-Verknüpfung:
+ * - GET /api/military/status -> military.routes -> military.controller.getStatus
+ * - POST /api/military/upgrade -> military.routes -> military.controller.upgradeKaserne
+ * - POST /api/military/train -> military.routes -> military.controller.trainEinheit
  */
 
 const MAX_KASERNE_STUFE = 4;
@@ -15,6 +19,7 @@ async function loadMilitaerStatus() {
   const einheitenListe = document.getElementById('einheitenListe');
   if (!kaserneStatus) return;
 
+  // Holt den vollständigen Militärstatus (Kaserne, Einheiten, Ressourcen) aus dem Backend.
   const response = await fetch('/api/military/status');
   if (!response.ok) {
     kaserneStatus.innerHTML = '<p class="empty-state">Militärstatus konnte nicht geladen werden.</p>';
@@ -128,7 +133,7 @@ function renderKaserneStatus(data, container) {
 function renderEinheitenListe(data, container, fabrikTyp = 'Kaserne') {
   const { kaserneStufe, fahrzeugfabrikAnzahl, einheiten } = data;
 
-  /* Check if the selected building is available */
+  // Prüft, ob die aktuell ausgewählte Ausbildungsstätte bereits gebaut wurde.
   let gebaeudeDa = false;
   if (fabrikTyp === 'Kaserne') {
     gebaeudeDa = kaserneStufe > 0;
@@ -209,6 +214,7 @@ async function doUpgradeKaserne() {
   const btn = document.getElementById('btnUpgradeKaserne');
   if (btn) btn.disabled = true;
 
+  // Triggert das Kaserne-Upgrade im Backend.
   const result = await postData('/api/military/upgrade', {});
   if (message) message.textContent = result.message;
 
@@ -226,6 +232,7 @@ async function doTrainEinheit(einheitTypId) {
   const input = document.getElementById(`anzahl-einheit-${einheitTypId}`);
   const anzahl = input ? Math.max(1, parseInt(input.value, 10) || 1) : 1;
 
+  // Triggert die Ausbildung/Produktion der gewählten Einheit im Backend.
   const result = await postData('/api/military/train', { einheitTypId, anzahl });
   if (message) message.textContent = result.message;
 

@@ -1,7 +1,14 @@
 'use strict';
 
+/*
+ * Konfigurationsdatei:
+ * Liest Umgebungsvariablen ein, setzt sichere Defaults und exportiert
+ * eine zentrale Konfiguration für Server, Session und Datenbank.
+ */
+
 const isProduction = process.env.NODE_ENV === 'production';
 
+// In Produktion sind sicherheitsrelevante Variablen verpflichtend.
 if (isProduction && !process.env.SESSION_SECRET) {
   console.error('FATAL: SESSION_SECRET muss in Production gesetzt sein (NODE_ENV=production).');
   process.exit(1);

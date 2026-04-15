@@ -1,5 +1,11 @@
 'use strict';
 
+/*
+ * Buildings-Controller:
+ * Liefert Gebäudetypen/Warteschlange und verarbeitet Bauanfragen.
+ * Nutzt Services für Tick-Logik und Repositories für DB-Zugriffe.
+ */
+
 const pool = require('../db');
 const buildingRepo = require('../repositories/building.repository');
 const resourcesRepo = require('../repositories/resources.repository');
@@ -7,6 +13,7 @@ const economyService = require('../services/economy.service');
 const playerService = require('../services/player.service');
 
 async function getTypes(req, res) {
+  // Gibt alle im Spiel konfigurierten Gebäudetypen zurück.
   const types = await buildingRepo.findAllTypes();
   res.json(types);
 }
@@ -16,6 +23,7 @@ async function getQueue(req, res) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    // Vor Ausgabe werden fertige Aufträge ins Gebäudekonto übertragen.
     await economyService.processFertigeBauauftraege(spielerId, client);
     const queue = await buildingRepo.findBauauftraegeBySpielerId(spielerId, client);
     await client.query('COMMIT');
@@ -36,10 +44,10 @@ async function build(req, res) {
 
     await client.query('BEGIN');
 
-    /* Erst alte Produktion verrechnen */
+    // Erst den Wirtschaftsstand auf den aktuellen Tick-Zeitpunkt bringen.
     await economyService.applyProductionTicks(spielerId, client);
 
-    /* Fertige Bauaufträge verarbeiten */
+    // Danach alle inzwischen fertig gewordenen Aufträge einbuchen.
     await economyService.processFertigeBauauftraege(spielerId, client);
 
     const gebaeude = await buildingRepo.findTypById(gebaeudeTypId, client);
@@ -48,6 +56,7 @@ async function build(req, res) {
       return res.status(404).json({ message: 'Gebäudetyp nicht gefunden' });
     }
 
+    // Spielregeln: Hauptgebäude nicht baubar, Kaserne nur einmal.
     if (gebaeude.name === 'Hauptgebäude') {
       await client.query('ROLLBACK');
       return res.status(400).json({ message: 'Hauptgebäude kann nicht gebaut werden' });
@@ -61,6 +70,7 @@ async function build(req, res) {
       }
     }
 
+    // Spielregel: Maximal 5 Raffinerien pro vorhandenem Bohrturm.
     if (gebaeude.name === 'Öl-Raffinerie') {
       const bohrturmAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Bohrturm', client);
       const raffinerieAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Öl-Raffinerie', client);
@@ -75,6 +85,7 @@ async function build(req, res) {
       }
     }
 
+    // Ressourcen werden per FOR UPDATE gesperrt gelesen (konkurrenzsicher).
     const ressourcen = await resourcesRepo.findBySpielerIdLocked(spielerId, client);
     if (!ressourcen) {
       await client.query('ROLLBACK');
@@ -98,6 +109,7 @@ async function build(req, res) {
       return res.status(400).json({ message: 'Zu wenig Treibstoff' });
     }
 
+    // Vor dem Bau wird geprüft, ob nach dem Bau genug freie Stromleistung bleibt.
     const statusVorher = await economyService.getGebaeudeStatus(spielerId, client);
     const neueFreieLeistung =
       statusVorher.strom.produktion +
@@ -109,6 +121,7 @@ async function build(req, res) {
       return res.status(400).json({ message: 'Nicht genug Strom für dieses Gebäude' });
     }
 
+    // Kosten werden sofort abgezogen; der Effekt des Baus folgt je nach Bauzeit sofort oder verzögert.
     await resourcesRepo.deductResources(
       spielerId,
       Number(gebaeude.kosten_geld) * anzahl,
@@ -121,7 +134,7 @@ async function build(req, res) {
     const label = anzahl > 1 ? `${anzahl}x ${gebaeude.name}` : gebaeude.name;
 
     if (Number(gebaeude.bauzeit_minuten) > 0) {
-      /* Prüfen ob dieses Gebäude bereits in der Warteschlange ist */
+      // Pro Gebäudetyp darf nur ein aktiver Auftrag parallel in der Warteschlange liegen.
       const existingOrder = await buildingRepo.findExistingBauauftrag(spielerId, gebaeudeTypId, client);
       if (existingOrder) {
         await client.query('ROLLBACK');

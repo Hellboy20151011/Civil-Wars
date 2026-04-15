@@ -1,8 +1,13 @@
 'use strict';
 
+/*
+ * Middleware-Helfer:
+ * Verpackt async-Controller, damit Fehler automatisch an den zentralen
+ * Express-Fehler-Handler weitergereicht werden.
+ */
+
 /**
- * Wraps an async route handler so that rejected promises are forwarded
- * to Express's next(err) error handler instead of causing unhandled rejections.
+ * Gibt einen Express-Handler zurück, der Promise-Rejections per next(err) weiterleitet.
  */
 function asyncWrapper(fn) {
   return (req, res, next) => {

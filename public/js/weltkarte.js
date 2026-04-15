@@ -5,6 +5,9 @@
  * Berechnet die Reisezeit so, dass:
  * - direkte Nachbarn mindestens 5 Minuten brauchen
  * - maximal entfernte Spieler höchstens 120 Minuten brauchen
+ * API-Verknüpfung:
+ * - GET /api/me -> me.routes -> me.controller.me
+ * - GET /api/weltkarte -> weltkarte.routes -> weltkarte.controller.getWeltkarte
  */
 
 /* Karten-Einstellungen */

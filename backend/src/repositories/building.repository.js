@@ -1,13 +1,21 @@
 'use strict';
 
+/*
+ * Building-Repository:
+ * Kapselt alle SQL-Zugriffe rund um Gebäudetypen, Spielergebäude und Bauaufträge.
+ * Wird von Controllern und Services als Datenzugriffsschicht genutzt.
+ */
+
 const pool = require('../db');
 
 async function findAllTypes(client = pool) {
+  // Alle Gebäude-Stammdaten für Bauzentrum und Prüfungen laden.
   const result = await client.query('SELECT * FROM gebaeude_typen ORDER BY id');
   return result.rows;
 }
 
 async function findTypById(id, client = pool) {
+  // Einen konkreten Gebäudetyp per ID laden.
   const result = await client.query(
     'SELECT * FROM gebaeude_typen WHERE id = $1',
     [id]
@@ -16,6 +24,7 @@ async function findTypById(id, client = pool) {
 }
 
 async function findHauptgebaeude(client = pool) {
+  // Startgebäude für neue Spieler ermitteln.
   const result = await client.query(
     "SELECT id FROM gebaeude_typen WHERE name = 'Hauptgebäude' LIMIT 1"
   );
@@ -23,6 +32,7 @@ async function findHauptgebaeude(client = pool) {
 }
 
 async function findBySpieler(spielerId, client = pool) {
+  // Gebäude eines Spielers mit allen relevanten Produktions-/Kostenwerten laden.
   const result = await client.query(
     `SELECT
         gt.id,
@@ -51,6 +61,7 @@ async function findBySpieler(spielerId, client = pool) {
 }
 
 async function findSpielerGebaeudeAnzahlByName(spielerId, name, client = pool) {
+  // Hilfsabfrage für Spielregeln (z. B. Kaserne nur einmal, Raffinerie-Limit).
   const result = await client.query(
     `SELECT sg.anzahl
      FROM spieler_gebaeude sg
@@ -62,6 +73,7 @@ async function findSpielerGebaeudeAnzahlByName(spielerId, name, client = pool) {
 }
 
 async function findKaserneStufe(spielerId, client = pool) {
+  // Aktuelle Kaserne-Stufe eines Spielers lesen.
   const result = await client.query(
     `SELECT sg.stufe
      FROM spieler_gebaeude sg
@@ -73,6 +85,7 @@ async function findKaserneStufe(spielerId, client = pool) {
 }
 
 async function upgradeKaserneStufe(spielerId, client = pool) {
+  // Erhöht die Kaserne-Stufe um genau 1.
   await client.query(
     `UPDATE spieler_gebaeude sg
      SET stufe = sg.stufe + 1
@@ -85,6 +98,7 @@ async function upgradeKaserneStufe(spielerId, client = pool) {
 }
 
 async function upsertSpielerGebaeude(spielerId, gebaeudeTypId, anzahl = 1, client = pool) {
+  // Fügt Gebäude hinzu oder erhöht bei bestehendem Eintrag die Anzahl.
   await client.query(
     `INSERT INTO spieler_gebaeude (spieler_id, gebaeude_typ_id, anzahl)
      VALUES ($1, $2, $3)
@@ -95,11 +109,13 @@ async function upsertSpielerGebaeude(spielerId, gebaeudeTypId, anzahl = 1, clien
 }
 
 async function findKaserneStufen(client = pool) {
+  // Alle Upgrade-Stufen der Kaserne laden (für Status-/UI-Anzeige).
   const result = await client.query('SELECT * FROM kaserne_stufen ORDER BY stufe');
   return result.rows;
 }
 
 async function findKaserneStufenById(stufe, client = pool) {
+  // Kosten einer konkreten Kaserne-Stufe laden.
   const result = await client.query(
     'SELECT * FROM kaserne_stufen WHERE stufe = $1',
     [stufe]
@@ -108,6 +124,7 @@ async function findKaserneStufenById(stufe, client = pool) {
 }
 
 async function createBauauftrag(spielerId, gebaeudeTypId, anzahl, bauzeit_minuten, client = pool) {
+  // Legt einen zeitverzögerten Bauauftrag an.
   const result = await client.query(
     `INSERT INTO bau_auftraege (spieler_id, gebaeude_typ_id, anzahl, fertig_am)
      VALUES ($1, $2, $3, NOW() + ($4 || ' minutes')::INTERVAL)
@@ -118,6 +135,7 @@ async function createBauauftrag(spielerId, gebaeudeTypId, anzahl, bauzeit_minute
 }
 
 async function findBauauftraegeBySpielerId(spielerId, client = pool) {
+  // Aktuelle Warteschlange eines Spielers inkl. Gebäudename laden.
   const result = await client.query(
     `SELECT ba.id, ba.spieler_id, ba.gebaeude_typ_id, ba.anzahl,
             ba.begonnen_am, ba.fertig_am, gt.name AS gebaeude_name
@@ -131,6 +149,7 @@ async function findBauauftraegeBySpielerId(spielerId, client = pool) {
 }
 
 async function findFertigeBauauftraege(spielerId, client = pool) {
+  // Nur Aufträge zurückgeben, deren Fertigstellungszeit bereits erreicht ist.
   const result = await client.query(
     `SELECT ba.id, ba.spieler_id, ba.gebaeude_typ_id, ba.anzahl
      FROM bau_auftraege ba
@@ -142,6 +161,7 @@ async function findFertigeBauauftraege(spielerId, client = pool) {
 }
 
 async function findExistingBauauftrag(spielerId, gebaeudeTypId, client = pool) {
+  // Prüft, ob bereits ein aktiver Auftrag für denselben Gebäudetyp läuft.
   const result = await client.query(
     `SELECT id FROM bau_auftraege
      WHERE spieler_id = $1 AND gebaeude_typ_id = $2 AND fertig_am > NOW()
@@ -152,6 +172,7 @@ async function findExistingBauauftrag(spielerId, gebaeudeTypId, client = pool) {
 }
 
 async function deleteBauauftrag(id, client = pool) {
+  // Entfernt einen abgearbeiteten Bauauftrag aus der Warteschlange.
   await client.query('DELETE FROM bau_auftraege WHERE id = $1', [id]);
 }
 

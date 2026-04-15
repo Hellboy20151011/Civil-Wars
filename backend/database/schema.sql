@@ -1,3 +1,8 @@
+-- schema.sql:
+-- Erstellt die Kernstruktur der Datenbank (Spieler, Ressourcen, Gebäude, Einheiten, Sessions)
+-- und pflegt zentrale Stammdaten per UPSERT ein.
+
+-- Spieler-Stammdaten inklusive optionaler Weltkarten-Koordinaten.
 CREATE TABLE IF NOT EXISTS spieler (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
@@ -13,6 +18,7 @@ CREATE TABLE IF NOT EXISTS spieler (
 -- nicht gespeichert, sondern dynamisch aus den Gebäudedaten berechnet wird.
 -- Auf vorhandenen Datenbanken einmalig ausführen:
 -- ALTER TABLE spieler_ressourcen DROP COLUMN IF EXISTS strom;
+-- Ressourcenkonto pro Spieler (1:1-Beziehung zu spieler).
 CREATE TABLE IF NOT EXISTS spieler_ressourcen (
     id SERIAL PRIMARY KEY,
     spieler_id INTEGER NOT NULL UNIQUE REFERENCES spieler(id) ON DELETE CASCADE,
@@ -23,6 +29,7 @@ CREATE TABLE IF NOT EXISTS spieler_ressourcen (
     letzte_aktualisierung TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Gebäude-Stammdaten (Kosten, Produktion, Kategorien, Bauzeit).
 CREATE TABLE IF NOT EXISTS gebaeude_typen (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
@@ -42,6 +49,7 @@ CREATE TABLE IF NOT EXISTS gebaeude_typen (
     bauzeit_minuten INTEGER NOT NULL DEFAULT 0
 );
 
+-- Besitzstand eines Spielers pro Gebäudetyp.
 CREATE TABLE IF NOT EXISTS spieler_gebaeude (
     spieler_id INTEGER NOT NULL REFERENCES spieler(id) ON DELETE CASCADE,
     gebaeude_typ_id INTEGER NOT NULL REFERENCES gebaeude_typen(id) ON DELETE CASCADE,
@@ -50,6 +58,7 @@ CREATE TABLE IF NOT EXISTS spieler_gebaeude (
     PRIMARY KEY (spieler_id, gebaeude_typ_id)
 );
 
+-- Ausbaukosten der Kaserne je Stufe.
 CREATE TABLE IF NOT EXISTS kaserne_stufen (
     stufe             INTEGER PRIMARY KEY,
     kosten_geld       BIGINT  NOT NULL DEFAULT 0,
@@ -58,6 +67,7 @@ CREATE TABLE IF NOT EXISTS kaserne_stufen (
     bauzeit_minuten   INTEGER NOT NULL DEFAULT 0
 );
 
+-- Einheitentypen inkl. Fabrikzuordnung (Kaserne/Fahrzeugfabrik).
 CREATE TABLE IF NOT EXISTS einheiten_typen (
     id                  SERIAL  PRIMARY KEY,
     name                VARCHAR(100) NOT NULL UNIQUE,
@@ -71,6 +81,7 @@ CREATE TABLE IF NOT EXISTS einheiten_typen (
     fabrik_typ          VARCHAR(100) NOT NULL DEFAULT 'Kaserne'
 );
 
+-- Einheitenbestand pro Spieler.
 CREATE TABLE IF NOT EXISTS spieler_einheiten (
     spieler_id      INTEGER NOT NULL REFERENCES spieler(id) ON DELETE CASCADE,
     einheit_typ_id  INTEGER NOT NULL REFERENCES einheiten_typen(id) ON DELETE CASCADE,
@@ -78,6 +89,7 @@ CREATE TABLE IF NOT EXISTS spieler_einheiten (
     PRIMARY KEY (spieler_id, einheit_typ_id)
 );
 
+-- Bauwarteschlange mit Start-/Fertigzeitpunkt.
 CREATE TABLE IF NOT EXISTS bau_auftraege (
     id SERIAL PRIMARY KEY,
     spieler_id INTEGER NOT NULL REFERENCES spieler(id) ON DELETE CASCADE,
@@ -90,6 +102,7 @@ CREATE TABLE IF NOT EXISTS bau_auftraege (
 CREATE INDEX IF NOT EXISTS bau_auftraege_spieler_idx ON bau_auftraege (spieler_id);
 CREATE INDEX IF NOT EXISTS bau_auftraege_fertig_am_idx ON bau_auftraege (fertig_am);
 
+-- Session-Speicher für express-session (connect-pg-simple).
 CREATE TABLE IF NOT EXISTS user_sessions (
     sid VARCHAR NOT NULL PRIMARY KEY,
     sess JSON NOT NULL,
@@ -98,6 +111,7 @@ CREATE TABLE IF NOT EXISTS user_sessions (
 
 CREATE INDEX IF NOT EXISTS user_sessions_expire_idx ON user_sessions (expire);
 
+-- Gebäude-Stammdaten initial einspielen bzw. aktualisieren.
 INSERT INTO gebaeude_typen (name, kategorie, beschreibung, kosten_geld, kosten_stein, kosten_eisen, kosten_treibstoff, einkommen_geld, produktion_stein, produktion_eisen, produktion_treibstoff, strom_produktion, strom_verbrauch, bewohner, bauzeit_minuten)
 VALUES
     ('Hauptgebäude',        'Regierung',  'Das Hauptgebäude ist das erste Gebäude und schaltet weitere Gebäude frei.',                                                                                                                                            0,      0,   0,   0,  0,    0,  0,  0, 10, 0, 0,  0),
@@ -111,7 +125,7 @@ VALUES
     ('Bohrturm',            'Industrie',  'Der Bohrturm fördert Rohöl, welches in der Öl-Raffinerie zu Treibstoff umgewandelt werden kann. Jeder Bohrturm kann maximal 5 Öl-Raffinerien mit Rohöl versorgen.',                                                  200000, 20,  100, 0,  0,    0,  0,  0, 0,  3, 0,  8),
     ('Öl-Raffinerie',       'Industrie',  'Die Öl-Raffinerie wandelt Rohöl in Treibstoff um. Treibstoff benötigst du zum Angreifen oder Spionieren. Jede Öl-Raffinerie produziert 50 l Treibstoff.',                                                             300000, 100, 100, 0,  0,    0,  0,  50, 0,  3, 0,  8),
     ('Kaserne',             'Militär',    'Dort wird die Infanterie ausgebildet.',                                                                                                                                                                                500000, 150, 200, 0,  0,    0,  0,  0, 0,  10, 0, 15),
-    -- Costs and build times for the following buildings are not yet defined in the design spec (placeholder values).
+    -- Für die folgenden Gebäude sind Kosten/Bauzeiten aktuell Platzhalterwerte.
     ('Fahrzeugfabrik',      'Militär',    'Dort werden sämtliche Fahrzeuge produziert.',                                                                                                                                                                          0,      0,   0,   0,  0,    0,  0,  0, 0,  0, 0,  0),
     ('Flughafen',           'Militär',    'Hier werden sämtliche Lufteinheiten gebaut.',                                                                                                                                                                          0,      0,   0,   0,  0,    0,  0,  0, 0,  0, 0,  0),
     ('Schiffswerft',        'Militär',    'Hier werden alle Schiffe gebaut.',                                                                                                                                                                                     0,      0,   0,   0,  0,    0,  0,  0, 0,  0, 0,  0),
@@ -134,6 +148,7 @@ ON CONFLICT (name) DO UPDATE SET
     bewohner             = EXCLUDED.bewohner,
     bauzeit_minuten      = EXCLUDED.bauzeit_minuten;
 
+-- Kaserne-Stufen initial einspielen bzw. aktualisieren.
 INSERT INTO kaserne_stufen (stufe, kosten_geld, kosten_stein, kosten_eisen, bauzeit_minuten)
 VALUES
     (1,   500000,   150,   200, 15),
@@ -146,6 +161,7 @@ ON CONFLICT (stufe) DO UPDATE SET
     kosten_eisen    = EXCLUDED.kosten_eisen,
     bauzeit_minuten = EXCLUDED.bauzeit_minuten;
 
+-- Einheitentypen initial einspielen bzw. aktualisieren.
 INSERT INTO einheiten_typen (name, kaserne_stufe_min, angriff, abwehr, kosten_geld, kosten_stein, kosten_eisen, reisezeit_minuten, fabrik_typ)
 VALUES
     ('Panzergrenadier',  1, 3,  3,  20000,  30,  50, 1440, 'Kaserne'),

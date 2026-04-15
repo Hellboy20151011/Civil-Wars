@@ -1,9 +1,14 @@
 'use strict';
 
 /* eslint-disable no-unused-vars */
+/*
+ * Fehler-Middleware:
+ * Einheitlicher API-Fehlerausgangspunkt für alle Controller und Middleware.
+ */
+
 /**
- * Central Express error-handling middleware.
- * Must be registered last (after all routes) with exactly 4 parameters.
+ * Zentraler Express-Fehler-Handler.
+ * Muss als letzte Middleware mit vier Parametern registriert werden.
  */
 function errorHandler(err, req, res, next) {
   console.error(err);

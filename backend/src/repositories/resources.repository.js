@@ -1,8 +1,14 @@
 'use strict';
 
+/*
+ * Ressourcen-Repository:
+ * Verwaltet SQL-Zugriffe auf spieler_ressourcen (lesen, initialisieren, addieren, abziehen).
+ */
+
 const pool = require('../db');
 
 async function findBySpielerIdLocked(spielerId, client = pool) {
+  // FOR UPDATE verhindert Konflikte bei gleichzeitigen Buchungen.
   const result = await client.query(
     `SELECT spieler_id, geld, stein, eisen, treibstoff, letzte_aktualisierung
      FROM spieler_ressourcen
@@ -14,6 +20,7 @@ async function findBySpielerIdLocked(spielerId, client = pool) {
 }
 
 async function initForSpieler(spielerId, client = pool) {
+  // Erstellt Startdatensatz für neue Spieler.
   await client.query(
     `INSERT INTO spieler_ressourcen (spieler_id, letzte_aktualisierung)
      VALUES ($1, CURRENT_TIMESTAMP)`,
@@ -30,6 +37,7 @@ async function addResources(
   neueLetzteAktualisierung,
   client = pool
 ) {
+  // Tick-Produktion auf bestehende Ressourcensummen aufschlagen.
   const result = await client.query(
     `UPDATE spieler_ressourcen
      SET geld = geld + $1,
@@ -45,6 +53,7 @@ async function addResources(
 }
 
 async function deductResources(spielerId, geld, stein, eisen, treibstoff, client = pool) {
+  // Kosten für Bauten/Upgrades/Ausbildung abbuchen.
   await client.query(
     `UPDATE spieler_ressourcen
      SET geld = geld - $1,

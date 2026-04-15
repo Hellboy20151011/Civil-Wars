@@ -11,7 +11,7 @@
 ## 🐛 Bugs
 
 * `backend/src/controllers/auth.controller.js:61-63`
-  → Problem: Jeder `23505`-Fehler wird als „Name oder E-Mail bereits vergeben“ gemeldet. Bei Kollision der Weltkarten-Koordinaten (`UNIQUE (koordinate_x, koordinate_y)`) ist die Fehlermeldung fachlich falsch.
+  → Problem: Jeder `23505`-Fehler wird als „Name oder E-Mail bereits vergeben“ zurückgegeben. Bei Kollision der Weltkarten-Koordinaten (`UNIQUE (koordinate_x, koordinate_y)`) ist die Fehlermeldung fachlich falsch.
   → Fix: `error.constraint` auswerten und unterschiedliche Meldungen für `spieler_name_key`, `spieler_email_key`, `spieler_koordinate_x_koordinate_y_key` zurückgeben.
 
 * `public/js/render/bauzentrumView.js:186-192`
@@ -33,7 +33,7 @@
   → Not imported anywhere (wird in keiner HTML-Datei per `<script>` eingebunden). Funktional durch `public/js/pages/militaer.page.js` + `public/js/render/militaerView.js` ersetzt.
 
 * `backend/src/repositories/einheiten.repository.js:10-14`
-  → `findAllEinheitenTypen` ist exportiert, wird im Repository aber nirgendwo aufgerufen.
+  → `findAllEinheitenTypen` ist exportiert, wird aber nirgendwo im Codebase aufgerufen.
 
 ---
 
@@ -76,7 +76,7 @@
   → Fix: Legacy-Dateien entfernen oder klar als deprecated markieren und README auf die aktive Struktur ausrichten.
 
 * `README.md:103-107`
-  → Problem: Dokumentation zeigt weiterhin die alten Frontend-Dateien (`dashboard.js`, `militaer.js`) als aktive Struktur, obwohl die HTML-Seiten bereits modulare Dateien laden.
+  → Problem: Dokumentation zeigt noch die alten Frontend-Dateien (`dashboard.js`, `militaer.js`) als aktive Struktur, obwohl die HTML-Seiten bereits modulare Dateien laden.
   → Fix: Projektstruktur im README an die tatsächlich eingebundene `core/`, `render/`, `pages/`-Struktur anpassen (z. B. `public/js/core/api.js`, `public/js/render/dashboardView.js`, `public/js/pages/dashboard.page.js`).
 
 * `public/js/weltkarte.js:26-39`

@@ -24,7 +24,6 @@ async function getStatus(req, res) {
     await economyService.applyProductionTicks(spielerId, client);
 
     const kaserneStufe = await buildingRepo.findKaserneStufe(spielerId, client);
-    const kaserneStufen = await buildingRepo.findKaserneStufen(client);
     const fahrzeugfabrikAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Fahrzeugfabrik', client);
     const einheiten = await einheitenRepo.findSpielerEinheiten(spielerId, client);
     const ressourcen = await resourcesRepo.findBySpielerIdLocked(spielerId, client);
@@ -33,8 +32,9 @@ async function getStatus(req, res) {
 
     // Nächste Upgrade-Stufe inklusive Kosten für das Frontend vorbereiten.
     const nextStufe = kaserneStufe < MAX_KASERNE_STUFE ? kaserneStufe + 1 : null;
+    // Nur die konkrete nächste Stufe laden statt aller Stufen (gezieltere DB-Abfrage).
     const nextUpgrade = nextStufe
-      ? kaserneStufen.find((s) => Number(s.stufe) === nextStufe) || null
+      ? await buildingRepo.findKaserneStufenById(nextStufe)
       : null;
 
     res.json({

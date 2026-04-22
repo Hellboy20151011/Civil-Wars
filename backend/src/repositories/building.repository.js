@@ -72,6 +72,24 @@ async function findSpielerGebaeudeAnzahlByName(spielerId, name, client = pool) {
   return result.rows[0] ? Number(result.rows[0].anzahl) : 0;
 }
 
+// Lädt die Anzahl von Bohrturm und Öl-Raffinerie in einer einzigen Abfrage.
+// Wird für die Raffinerie-Regel im Bauzentrum genutzt.
+async function findBohrturmUndRaffinerie(spielerId, client = pool) {
+  const result = await client.query(
+    `SELECT gt.name, COALESCE(sg.anzahl, 0) AS anzahl
+     FROM gebaeude_typen gt
+     LEFT JOIN spieler_gebaeude sg
+           ON sg.gebaeude_typ_id = gt.id AND sg.spieler_id = $1
+     WHERE gt.name IN ('Bohrturm', 'Öl-Raffinerie')`,
+    [spielerId]
+  );
+  const anzahlMap = { Bohrturm: 0, 'Öl-Raffinerie': 0 };
+  for (const row of result.rows) {
+    anzahlMap[row.name] = Number(row.anzahl);
+  }
+  return anzahlMap;
+}
+
 async function findKaserneStufe(spielerId, client = pool) {
   // Aktuelle Kaserne-Stufe eines Spielers lesen.
   const result = await client.query(
@@ -176,12 +194,47 @@ async function deleteBauauftrag(id, client = pool) {
   await client.query('DELETE FROM bau_auftraege WHERE id = $1', [id]);
 }
 
+// Löscht alle fertigen Bauaufträge eines Spielers auf einmal (Batch-Delete).
+// Gibt die IDs der gelöschten Aufträge zurück.
+async function deleteFertigeBauauftraege(spielerId, client = pool) {
+  const result = await client.query(
+    'DELETE FROM bau_auftraege WHERE spieler_id = $1 AND fertig_am <= NOW() RETURNING id',
+    [spielerId]
+  );
+  return result.rows.map((row) => row.id);
+}
+
+// Bucht mehrere fertige Bauaufträge als Gebäude ein (ein Upsert pro Gebäudetyp).
+// Erwartet ein Array von { gebaeude_typ_id, anzahl }.
+async function batchUpsertSpielerGebaeude(spielerId, auftraege, client = pool) {
+  if (!auftraege || auftraege.length === 0) return;
+
+  // Aufträge nach Gebäudetyp zusammenfassen, damit pro Typ nur ein Upsert nötig ist.
+  const summenMap = new Map();
+  for (const auftrag of auftraege) {
+    const bisherig = summenMap.get(auftrag.gebaeude_typ_id) || 0;
+    summenMap.set(auftrag.gebaeude_typ_id, bisherig + auftrag.anzahl);
+  }
+
+  // Jeder Gebäudetyp wird in einem einzelnen Upsert eingebucht.
+  for (const [gebaeudeTypId, gesamtAnzahl] of summenMap) {
+    await client.query(
+      `INSERT INTO spieler_gebaeude (spieler_id, gebaeude_typ_id, anzahl)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (spieler_id, gebaeude_typ_id)
+       DO UPDATE SET anzahl = spieler_gebaeude.anzahl + $3`,
+      [spielerId, gebaeudeTypId, gesamtAnzahl]
+    );
+  }
+}
+
 module.exports = {
   findAllTypes,
   findTypById,
   findHauptgebaeude,
   findBySpieler,
   findSpielerGebaeudeAnzahlByName,
+  findBohrturmUndRaffinerie,
   findKaserneStufe,
   upgradeKaserneStufe,
   upsertSpielerGebaeude,
@@ -192,4 +245,6 @@ module.exports = {
   findFertigeBauauftraege,
   findExistingBauauftrag,
   deleteBauauftrag,
+  deleteFertigeBauauftraege,
+  batchUpsertSpielerGebaeude,
 };

@@ -72,8 +72,10 @@ async function build(req, res) {
 
     // Spielregel: Maximal 5 Raffinerien pro vorhandenem Bohrturm.
     if (gebaeude.name === 'Öl-Raffinerie') {
-      const bohrturmAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Bohrturm', client);
-      const raffinerieAnzahl = await buildingRepo.findSpielerGebaeudeAnzahlByName(spielerId, 'Öl-Raffinerie', client);
+      // Bohrturm- und Raffinerie-Anzahl in einem einzigen DB-Roundtrip ermitteln.
+      const anzahlen = await buildingRepo.findBohrturmUndRaffinerie(spielerId, client);
+      const bohrturmAnzahl = anzahlen['Bohrturm'];
+      const raffinerieAnzahl = anzahlen['Öl-Raffinerie'];
       const maxRaffinerie = bohrturmAnzahl * 5;
       if (raffinerieAnzahl + anzahl > maxRaffinerie) {
         await client.query('ROLLBACK');

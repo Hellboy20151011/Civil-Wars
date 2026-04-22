@@ -21,23 +21,6 @@ const MAX_ENTFERNUNG = Math.round(
   Math.sqrt((KARTE_GROESSE - 1) ** 2 + (KARTE_GROESSE - 1) ** 2)
 );
 
-/* ── Hilfsfunktionen ─────────────────────────────────────────── */
-
-function setEl(id, text) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = text;
-}
-
-function escapeHtml(wert) {
-  if (wert === null || wert === undefined) return '';
-  return String(wert)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 /* ── Entfernung berechnen ──────────────────────────────────────
    Euklidische Distanz zwischen zwei Koordinatenpunkten.
    Formel: sqrt((x2-x1)^2 + (y2-y1)^2), gerundet auf ganze Felder. */

@@ -53,9 +53,11 @@ async function create(name, email, passwortHash, koordinateX, koordinateY, clien
 }
 
 // Alle Spieler mit Koordinaten für die Weltkartenansicht laden.
-async function findAll(client = pool) {
+// Mit optionalem Limit und Offset für seitenweises Laden (Paging).
+async function findAll(limit = 200, offset = 0, client = pool) {
   const result = await client.query(
-    'SELECT id, name, koordinate_x, koordinate_y FROM spieler ORDER BY name'
+    'SELECT id, name, koordinate_x, koordinate_y FROM spieler ORDER BY name LIMIT $1 OFFSET $2',
+    [limit, offset]
   );
   return result.rows;
 }

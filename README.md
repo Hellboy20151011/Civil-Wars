@@ -102,9 +102,22 @@ Civil-Wars/
 │   └── js/                   # Frontend-JavaScript (modular)
 │       ├── utils.js          # Hilfsfunktionen (escapeHtml, setEl, postData)
 │       ├── auth.js           # Login- und Registrierungslogik
-│       ├── dashboard.js      # Dashboard, Gebäudeverwaltung, Logout
-│       ├── militaer.js       # Militärseite: Kaserne, Einheiten, Fahrzeuge
-│       └── weltkarte.js      # Weltkarte: Spieler auf Koordinatengitter anzeigen
+│       ├── weltkarte.js      # Weltkarte: Spieler auf Koordinatengitter anzeigen
+│       ├── core/             # Infrastruktur: API-Calls, Live-Zustand, Timer
+│       │   ├── api.js        # Alle Backend-API-Aufrufe (fetch-Wrapper)
+│       │   ├── clock.js      # Tick-Uhr: synchronisiert Spielzeit mit dem Server
+│       │   ├── countdownLoop.js  # Countdown-Loop für Tick-Anzeige
+│       │   └── liveState.js  # Polling-basierter Live-Zustand (Subscriber-Pattern)
+│       ├── render/           # Rendering-Logik je Seite (reine UI-Funktionen)
+│       │   ├── dashboardView.js  # Dashboard-Karten und Ressourcenanzeige
+│       │   ├── bauzentrumView.js # Bauzentrum: Gebäudekarten, Bau-Queue
+│       │   ├── militaerView.js   # Militärseite: Kaserne, Einheiten, Fahrzeuge
+│       │   ├── bauQueue.js       # Bau-Queue-Anzeige (wird von Bauzentrum genutzt)
+│       │   └── shared.js         # Gemeinsame Render-Helfer (z. B. Ressourcenanzeige)
+│       └── pages/            # Seiten-Einstiegspunkte (initialisieren Core + Render)
+│           ├── dashboard.page.js    # Einstiegspunkt für dashboard.html
+│           ├── bauzentrum.page.js   # Einstiegspunkt für bauzentrum.html
+│           └── militaer.page.js     # Einstiegspunkt für militaer.html
 ├── CONTRIBUTING.md           # Hinweise für Mitwirkende
 ├── NEXT_STEPS.md             # Nächste Entwicklungsschritte
 └── README.md                 # Projektbeschreibung und Schnellstart

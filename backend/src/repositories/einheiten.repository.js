@@ -7,12 +7,6 @@
 
 const pool = require('../db');
 
-async function findAllEinheitenTypen(client = pool) {
-  // Stammdaten aller Einheitentypen laden.
-  const result = await client.query('SELECT * FROM einheiten_typen ORDER BY kaserne_stufe_min, id');
-  return result.rows;
-}
-
 async function findSpielerEinheiten(spielerId, client = pool) {
   // Einheitentypen mit aktuellem Bestand des Spielers zusammenführen.
   const result = await client.query(
@@ -58,7 +52,6 @@ async function findEinheitTypById(id, client = pool) {
 }
 
 module.exports = {
-  findAllEinheitenTypen,
   findSpielerEinheiten,
   upsertSpielerEinheiten,
   findEinheitTypById,

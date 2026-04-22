@@ -213,7 +213,7 @@ async function batchUpsertSpielerGebaeude(spielerId, auftraege, client = pool) {
   const summenMap = new Map();
   for (const auftrag of auftraege) {
     const bisherig = summenMap.get(auftrag.gebaeude_typ_id) || 0;
-    summenMap.set(auftrag.gebaeude_typ_id, bisherig + auftrag.anzahl);
+    summenMap.set(auftrag.gebaeude_typ_id, bisherig + Number(auftrag.anzahl));
   }
 
   // Jeder Gebäudetyp wird in einem einzelnen Upsert eingebucht.

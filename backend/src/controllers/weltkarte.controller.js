@@ -12,9 +12,12 @@ const MAX_LIMIT = 200;
 
 // GET /api/weltkarte -> nutzt player.repository.findAll mit Paging für die Kartenansicht.
 async function getWeltkarte(req, res) {
-  // Limit und Offset aus Query-Parametern lesen; Standardwerte und Obergrenzen sicherstellen.
-  const limit  = Math.min(parseInt(req.query.limit  || '200', 10), MAX_LIMIT);
-  const offset = Math.max(parseInt(req.query.offset || '0',   10), 0);
+  // Limit und Offset aus Query-Parametern lesen; ungültige Werte werden durch sichere Defaults ersetzt.
+  const parsedLimit  = parseInt(req.query.limit  || '', 10);
+  const parsedOffset = parseInt(req.query.offset || '', 10);
+
+  const limit  = Math.min(Number.isFinite(parsedLimit)  ? parsedLimit  : MAX_LIMIT, MAX_LIMIT);
+  const offset = Number.isFinite(parsedOffset) ? Math.max(parsedOffset, 0) : 0;
 
   const spieler = await playerRepo.findAll(limit, offset);
   res.json(spieler);

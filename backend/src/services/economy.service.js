@@ -138,12 +138,16 @@ async function applyProductionTicks(spielerId, client) {
 }
 
 async function processFertigeBauauftraege(spielerId, client) {
-  // Fertige Bauaufträge werden in Gebäude umgewandelt und danach aus der Queue gelöscht.
+  // Fertige Bauaufträge als Gebäude einbuchen und danach in einem Schritt löschen.
+  // Die Aufträge werden zuerst geladen, damit die Gebäudemengen korrekt summiert werden können.
   const fertige = await buildingRepo.findFertigeBauauftraege(spielerId, client);
-  for (const auftrag of fertige) {
-    await buildingRepo.upsertSpielerGebaeude(spielerId, auftrag.gebaeude_typ_id, auftrag.anzahl, client);
-    await buildingRepo.deleteBauauftrag(auftrag.id, client);
-  }
+  if (fertige.length === 0) return;
+
+  // Alle fertigen Aufträge als Gebäude einbuchen (gruppiert nach Typ – ein Upsert pro Typ).
+  await buildingRepo.batchUpsertSpielerGebaeude(spielerId, fertige, client);
+
+  // Alle fertigen Aufträge in einem einzigen DELETE entfernen.
+  await buildingRepo.deleteFertigeBauauftraege(spielerId, client);
 }
 
 module.exports = { getGebaeudeStatus, applyProductionTicks, processFertigeBauauftraege };

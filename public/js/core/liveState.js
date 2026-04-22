@@ -61,7 +61,12 @@
     subscribers.add(callback);
 
     if (latestSnapshot) {
-      callback(latestSnapshot);
+      // Fehler im initialen Callback dürfen den Aufrufer nicht unterbrechen.
+      try {
+        callback(latestSnapshot);
+      } catch (error) {
+        console.error('LiveState-Subscriber Fehler (initial):', error);
+      }
     }
 
     return function unsubscribe() {

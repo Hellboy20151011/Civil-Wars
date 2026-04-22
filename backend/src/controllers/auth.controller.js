@@ -59,6 +59,16 @@ async function register(req, res) {
   } catch (error) {
     await client.query('ROLLBACK');
     if (error.code === '23505') {
+      // Unterschiedliche UNIQUE-Verletzungen liefern unterschiedliche Fehlermeldungen.
+      if (error.constraint === 'spieler_email_key') {
+        return res.status(400).json({ message: 'Diese E-Mail-Adresse ist bereits vergeben' });
+      }
+      if (error.constraint === 'spieler_name_key') {
+        return res.status(400).json({ message: 'Dieser Name ist bereits vergeben' });
+      }
+      if (error.constraint === 'spieler_koordinate_x_koordinate_y_key') {
+        return res.status(503).json({ message: 'Kein freier Koordinatenplatz verfügbar' });
+      }
       return res.status(400).json({ message: 'Name oder E-Mail bereits vergeben' });
     }
     throw error;

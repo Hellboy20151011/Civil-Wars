@@ -184,11 +184,17 @@
     const message = document.getElementById('message');
 
     button.disabled = true;
-    const result = await global.CoreApi.buildBuilding(gebaeudeTypId, anzahl);
-    if (message) message.textContent = result.message || '';
-
-    await global.LiveState.refreshNow();
-    scheduleRenderBuildingCards();
+    try {
+      const result = await global.CoreApi.buildBuilding(gebaeudeTypId, anzahl);
+      if (message) message.textContent = result.message || '';
+      await global.LiveState.refreshNow();
+      scheduleRenderBuildingCards();
+    } catch (error) {
+      console.error('Fehler beim Bauen:', error);
+      if (message) message.textContent = 'Fehler beim Bauen. Bitte erneut versuchen.';
+    } finally {
+      button.disabled = false;
+    }
   }
 
   async function onTabClick(event) {
